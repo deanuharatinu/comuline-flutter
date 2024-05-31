@@ -15,6 +15,7 @@ class Comuline extends StatelessWidget {
       debugShowCheckedModeBanner: true,
       theme: ThemeData(
         fontFamily: 'GeistMono',
+        scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
