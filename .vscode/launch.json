@@ -1,0 +1,10 @@
+{
+  "configurations": [
+    {
+      "name": "comuline-flutter",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+    },
+  ]
+}
