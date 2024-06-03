@@ -1,9 +1,35 @@
 import 'package:comuline/comuline_theme.dart';
+import 'package:comuline/data/repository.dart';
+import 'package:comuline/features/home/home_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
+    required this.repository,
+    this.onThemeToggleTap,
+    super.key,
+  });
+
+  final Repository repository;
+  final VoidCallback? onThemeToggleTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => HomeBloc(
+        repository: repository,
+      ),
+      child: HomeView(
+        onThemeToggleTap: onThemeToggleTap,
+      ),
+    );
+  }
+}
+
+class HomeView extends StatefulWidget {
+  const HomeView({
     this.onThemeToggleTap,
     super.key,
   });
@@ -11,80 +37,97 @@ class HomeScreen extends StatelessWidget {
   final VoidCallback? onThemeToggleTap;
 
   @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  HomeBloc get _bloc => context.read<HomeBloc>();
+
+  @override
+  void initState() {
+    _bloc.add(const HomeLoadStations());
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = ComulineTheme.of(context);
 
-    return SafeArea(
-      child: Scaffold(
-        body: GestureDetector(
-          onTap: () => _releaseFocus(context),
-          child: CustomScrollView(
-            slivers: [
-              CustomAppBar(onThemeToggleTap: onThemeToggleTap),
-              SliverAppBar(
-                pinned: true,
-                floating: true,
-                surfaceTintColor: Colors.grey.shade500,
-                flexibleSpace: const FlexibleSpaceBar(
-                  titlePadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+    return BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
+      return SafeArea(
+        child: Scaffold(
+          body: GestureDetector(
+            onTap: () => _releaseFocus(context),
+            child: CustomScrollView(
+              slivers: [
+                CustomAppBar(onThemeToggleTap: widget.onThemeToggleTap),
+                SliverAppBar(
+                  pinned: true,
+                  floating: true,
+                  surfaceTintColor: Colors.grey.shade500,
+                  flexibleSpace: const FlexibleSpaceBar(
+                    titlePadding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    title: CustomSearchBar(),
                   ),
-                  title: CustomSearchBar(),
                 ),
-              ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  childCount: 20,
-                  (context, index) {
-                    return ExpansionTile(
-                      iconColor:
-                          theme.materialThemeData.listTileTheme.iconColor,
-                      shape: const Border(),
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Stasiun',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade700,
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    childCount: state.stations.length,
+                    (context, index) {
+                      final station = state.stations[index];
+
+                      return ExpansionTile(
+                        iconColor:
+                            theme.materialThemeData.listTileTheme.iconColor,
+                        shape: const Border(),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Stasiun',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade700,
+                              ),
                             ),
-                          ),
-                          Text(
-                            'Bekasi $index',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                            Text(
+                              station.name,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
+                          ],
+                        ),
+                        children: const [
+                          Text('data'),
+                          Text('data'),
+                          Text('data'),
                         ],
-                      ),
-                      children: [
-                        Text('data'),
-                        Text('data'),
-                        Text('data'),
-                      ],
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
+          ),
+          floatingActionButton: FloatingActionButton.small(
+            onPressed: () {
+              // TODO
+            },
+            foregroundColor: Colors.grey.shade600,
+            backgroundColor: Colors.grey.shade600,
+            child: const Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
           ),
         ),
-        floatingActionButton: FloatingActionButton.small(
-          onPressed: () {
-            // TODO
-          },
-          foregroundColor: Colors.grey.shade600,
-          backgroundColor: Colors.grey.shade600,
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
+      );
+    });
   }
 
   _releaseFocus(BuildContext context) => FocusScope.of(context).unfocus();
@@ -126,7 +169,10 @@ class CustomAppBar extends StatelessWidget {
       ),
       actions: [
         IconButton(
-          onPressed: onThemeToggleTap,
+          onPressed: () {
+            debugPrint('pencet');
+            onThemeToggleTap?.call();
+          },
           icon: Icon(
             Icons.dark_mode_outlined,
             color: Colors.grey.shade600,

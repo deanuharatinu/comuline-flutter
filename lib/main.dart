@@ -1,6 +1,7 @@
 import 'package:comuline/comuline_theme.dart';
 import 'package:comuline/comuline_theme_data.dart';
 import 'package:comuline/dark_mode_preference.dart';
+import 'package:comuline/data/repository.dart';
 import 'package:comuline/features/home/home_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +19,8 @@ class Comuline extends StatefulWidget {
 class _ComulineState extends State<Comuline> {
   var darkModePreference = DarkModePreference.alwaysLight;
 
+  late final _repository = Repository();
+
   @override
   Widget build(BuildContext context) {
     final lightTheme = LightComulineThemeData();
@@ -33,6 +36,7 @@ class _ComulineState extends State<Comuline> {
         theme: lightTheme.materialThemeData,
         darkTheme: darkTheme.materialThemeData,
         home: HomeScreen(
+          repository: _repository,
           onThemeToggleTap: () {
             setState(() {
               darkModePreference =
