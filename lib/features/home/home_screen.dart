@@ -1,268 +1,191 @@
-import 'package:flutter/cupertino.dart';
+import 'package:comuline/comuline_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    this.onThemeToggleTap,
+    super.key,
+  });
+
+  final VoidCallback? onThemeToggleTap;
 
   @override
   Widget build(BuildContext context) {
+    final theme = ComulineTheme.of(context);
+
     return SafeArea(
       child: Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              backgroundColor: Colors.white,
-              title: Row(
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/ic_comuline_logo.svg',
-                    width: 26,
-                    colorFilter: ColorFilter.mode(
-                      Colors.grey.shade400,
-                      BlendMode.srcIn,
-                    ),
+        body: GestureDetector(
+          onTap: () => _releaseFocus(context),
+          child: CustomScrollView(
+            slivers: [
+              CustomAppBar(onThemeToggleTap: onThemeToggleTap),
+              SliverAppBar(
+                pinned: true,
+                floating: true,
+                surfaceTintColor: Colors.grey.shade500,
+                flexibleSpace: const FlexibleSpaceBar(
+                  titlePadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Comuline',
-                    style: TextStyle(
-                      fontFamily: 'GeistMono',
-                      color: Colors.grey.shade400,
-                      fontSize: 18,
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.dark_mode_outlined,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                // IconButton(
-                //   onPressed: () {},
-                //   icon: Icon(
-                //     Icons.search,
-                //     color: Colors.grey.shade600,
-                //   ),
-                // ),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.swap_vert,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-              ],
-              // child: SizedBox(
-              //   height: 20,
-              //   child: Center(
-              //     child: Text('Scroll to see the SliverAppBar in effect.'),
-              //   ),
-              // ),
-            ),
-            SliverAppBar(
-              pinned: true,
-              floating: true,
-              surfaceTintColor: Colors.grey.shade500,
-              backgroundColor: Colors.white, // TODO pake dynamic theme
-              flexibleSpace: FlexibleSpaceBar(
-                titlePadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                title: SearchBar(
-                  shape: WidgetStatePropertyAll(
-                    RoundedRectangleBorder(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(8)),
-                        side: BorderSide(
-                          color: Colors.grey.shade400,
-                          width: 1,
-                        )),
-                  ),
-                  backgroundColor: WidgetStatePropertyAll(
-                      Colors.grey.shade400.withAlpha(20)), // TODO dynamic theme
-                  elevation: const WidgetStatePropertyAll(0),
-                  hintText: 'Cari stasiun keberangkatan',
-                  hintStyle: WidgetStatePropertyAll(
-                    TextStyle(color: Colors.grey.shade400),
-                  ),
-                  leading: const Padding(
-                    padding: EdgeInsets.only(left: 8),
-                    child: Icon(
-                      Icons.search,
-                    ),
-                  ),
+                  title: CustomSearchBar(),
                 ),
               ),
-            ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                childCount: 20,
-                (context, index) {
-                  return ExpansionTile(
-                    iconColor: Colors.grey.shade900,
-                    shape: const Border(),
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  childCount: 20,
+                  (context, index) {
+                    return ExpansionTile(
+                      iconColor:
+                          theme.materialThemeData.listTileTheme.iconColor,
+                      shape: const Border(),
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Stasiun',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                          Text(
+                            'Bekasi $index',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                       children: [
-                        Text(
-                          'Stasiun',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade700,
-                          ),
-                        ),
-                        Text(
-                          'Bekasi $index',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        Text('data'),
+                        Text('data'),
+                        Text('data'),
                       ],
-                    ),
-                    children: [
-                      Text('data'),
-                      Text('data'),
-                      Text('data'),
-                    ],
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        // appBar: AppBar(
-        // backgroundColor: Colors.white,
-        // title: Row(
-        //   children: [
-        //     SvgPicture.asset(
-        //       'assets/icons/ic_comuline_logo.svg',
-        //       width: 26,
-        //       colorFilter: ColorFilter.mode(
-        //         Colors.grey.shade400,
-        //         BlendMode.srcIn,
-        //       ),
-        //     ),
-        //     const SizedBox(width: 6),
-        //     Text(
-        //       'Comuline',
-        //       style: TextStyle(
-        //         fontFamily: 'GeistMono',
-        //         color: Colors.grey.shade400,
-        //         fontSize: 18,
-        //       ),
-        //     ),
-        //   ],
-        // ),
-        // actions: [
-        //   IconButton(
-        //     onPressed: () {},
-        //     icon: Icon(
-        //       Icons.dark_mode_outlined,
-        //       color: Colors.grey.shade600,
-        //     ),
-        //   ),
-        //   // IconButton(
-        //   //   onPressed: () {},
-        //   //   icon: Icon(
-        //   //     Icons.search,
-        //   //     color: Colors.grey.shade600,
-        //   //   ),
-        //   // ),
-        //   IconButton(
-        //     onPressed: () {},
-        //     icon: Icon(
-        //       Icons.swap_vert,
-        //       color: Colors.grey.shade600,
-        //     ),
-        //   ),
-        // ],
-        // ),
         floatingActionButton: FloatingActionButton.small(
           onPressed: () {
             // TODO
           },
           foregroundColor: Colors.grey.shade600,
           backgroundColor: Colors.grey.shade600,
-          child: Icon(
+          child: const Icon(
             Icons.add,
             color: Colors.white,
           ),
         ),
-        // body: ListView.separated(
-        //   separatorBuilder: (context, index) {
-        //     return Padding(
-        //       padding: const EdgeInsets.symmetric(
-        //         horizontal: 16,
-        //         vertical: 12,
-        //       ),
-        //       child: Container(
-        //         height: 1,
-        //         color: Colors.grey.shade300,
-        //       ),
-        //     );
-        //   },
-        //   itemCount: 2, // Ensure this is greater than zero
-        //   itemBuilder: (context, index) {
-        //     return ExpansionTile(
-        //       iconColor: Colors.grey.shade900,
-        //       shape: const Border(),
-        //       title: Column(
-        //         crossAxisAlignment: CrossAxisAlignment.start,
-        //         children: [
-        //           Text(
-        //             'Stasiun',
-        //             style: TextStyle(
-        //               fontSize: 12,
-        //               color: Colors.grey.shade700,
-        //             ),
-        //           ),
-        //           Text(
-        //             'Bekasi $index',
-        //             style: const TextStyle(
-        //               fontSize: 20,
-        //               fontWeight: FontWeight.bold,
-        //             ),
-        //           ),
-        //         ],
-        //       ),
-        //       children: [
-        //         Text('data'),
-        //         Text('data'),
-        //         Text('data'),
-        //       ],
-        //     );
-        //   },
-        // ),
-        // // body: Center(
-        //   child: ListView.builder(
-        //     itemBuilder: (context, index) {
-        //       Text(
-        //         'Title $index',
-        //         style: TextStyle(
-        //           color: Colors.black,
-        //         ),
-        //       );
-        //       // // TODO
-        // ExpansionTile(
-        //   title: Text('Title $index'),
-        //   children: [
-        //     Text('data'),
-        //     Text('data'),
-        //     Text('data'),
-        //   ],
-        // );
-        //     },
-        //     itemCount: 10,
-        //   ),
-        // ),
+      ),
+    );
+  }
+
+  _releaseFocus(BuildContext context) => FocusScope.of(context).unfocus();
+}
+
+class CustomAppBar extends StatelessWidget {
+  const CustomAppBar({
+    super.key,
+    this.onThemeToggleTap,
+    this.onSortTap,
+  });
+
+  final VoidCallback? onThemeToggleTap;
+  final VoidCallback? onSortTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverAppBar(
+      title: Row(
+        children: [
+          SvgPicture.asset(
+            'assets/icons/ic_comuline_logo.svg',
+            width: 26,
+            colorFilter: ColorFilter.mode(
+              Colors.grey.shade600,
+              BlendMode.srcIn,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            'Comuline',
+            style: TextStyle(
+              fontFamily: 'GeistMono',
+              color: Colors.grey.shade600,
+              fontSize: 18,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        IconButton(
+          onPressed: onThemeToggleTap,
+          icon: Icon(
+            Icons.dark_mode_outlined,
+            color: Colors.grey.shade600,
+          ),
+        ),
+        IconButton(
+          onPressed: onSortTap,
+          icon: Icon(
+            Icons.swap_vert,
+            color: Colors.grey.shade600,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class CustomSearchBar extends StatefulWidget {
+  const CustomSearchBar({super.key});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _CustomSearchBar();
+  }
+}
+
+class _CustomSearchBar extends State<CustomSearchBar> {
+  final _searchBarFocusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _searchBarFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ComulineTheme.of(context);
+
+    return SearchBar(
+      focusNode: _searchBarFocusNode,
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            side: BorderSide(
+              color: theme.materialThemeData.colorScheme.onSurface,
+              width: 1,
+            )),
+      ),
+      backgroundColor: WidgetStatePropertyAll(
+        Colors.grey.shade400.withAlpha(20),
+      ),
+      elevation: const WidgetStatePropertyAll(0),
+      hintText: 'Cari stasiun keberangkatan',
+      leading: const Padding(
+        padding: EdgeInsets.only(left: 8),
+        child: Icon(
+          Icons.search,
+        ),
       ),
     );
   }
