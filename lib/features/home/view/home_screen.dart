@@ -1,6 +1,6 @@
-import 'package:comuline/comuline_theme.dart';
+import 'package:comuline/component_library/theme/comuline_theme.dart';
 import 'package:comuline/data/repository.dart';
-import 'package:comuline/features/home/home_bloc.dart';
+import 'package:comuline/features/home/bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';

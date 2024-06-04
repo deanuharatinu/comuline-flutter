@@ -1,8 +1,8 @@
-import 'package:comuline/comuline_theme.dart';
-import 'package:comuline/comuline_theme_data.dart';
-import 'package:comuline/dark_mode_preference.dart';
+import 'package:comuline/component_library/theme/comuline_theme.dart';
+import 'package:comuline/component_library/theme/comuline_theme_data.dart';
+import 'package:comuline/component_library/theme/dark_mode_preference.dart';
 import 'package:comuline/data/repository.dart';
-import 'package:comuline/features/home/home_screen.dart';
+import 'package:comuline/features/home/view/home_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {

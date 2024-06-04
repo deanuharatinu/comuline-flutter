@@ -1,4 +1,4 @@
-import 'package:comuline/comuline_theme_data.dart';
+import 'package:comuline/component_library/theme/comuline_theme_data.dart';
 import 'package:flutter/material.dart';
 
 class ComulineTheme extends InheritedWidget {
