@@ -1,26 +1,28 @@
 part of 'home_bloc.dart';
 
-enum HomeStatus { initial, success, failure }
+enum HomeStatus { success, error, loading }
 
 final class HomeState extends Equatable {
   const HomeState({
-    this.status = HomeStatus.initial,
+    this.status = HomeStatus.loading,
     this.stations = const <Station>[],
+    this.error,
   });
 
   final HomeStatus status;
   final List<Station> stations;
+  final dynamic error;
 
-  HomeState copyWith({
-    HomeStatus? status,
-    List<Station>? stations,
+  HomeState copyWithError({
+    dynamic error,
   }) {
     return HomeState(
-      status: status ?? this.status,
-      stations: stations ?? this.stations,
+      status: HomeStatus.error,
+      error: error,
+      stations: stations,
     );
   }
 
   @override
-  List<Object?> get props => [status, stations];
+  List<Object?> get props => [status, stations, error];
 }

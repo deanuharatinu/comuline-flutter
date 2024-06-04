@@ -12,23 +12,30 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   })  : _repository = repository,
         super(const HomeState()) {
     on<HomeEvent>((event, emitter) async {
-      if (event is HomeLoadStations) {
-        await _loadStations(emitter);
+      if (event is HomeStarted) {
+        await _getStations(emitter);
+      } else if (event is HomeRefresh) {
+        // TODO
+        await _getStations(emitter);
       }
     });
   }
 
   final Repository _repository;
 
-  _loadStations(
+  Future<void> _getStations(
     Emitter emitter,
   ) async {
-    final stations = await _repository.loadStations();
-    emitter(
-      state.copyWith(
+    final streamOfStations = _repository.getStations().map((stations) {
+      return HomeState(
         status: HomeStatus.success,
         stations: stations,
-      ),
+      );
+    });
+
+    return emitter.onEach<HomeState>(
+      streamOfStations,
+      onData: emitter,
     );
   }
 }

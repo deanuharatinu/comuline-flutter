@@ -1,7 +1,7 @@
 import 'package:comuline/models/station.dart';
 
 class Repository {
-  Future<List<Station>> loadStations() {
+  Stream<List<Station>> getStations() async* {
     final stations = <Station>[];
     for (var i = 0; i < 3; i++) {
       stations.add(
@@ -16,6 +16,6 @@ class Repository {
       );
     }
 
-    return Future.value(stations);
+    yield stations;
   }
 }

@@ -45,92 +45,101 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   void initState() {
-    _bloc.add(const HomeLoadStations());
+    _bloc.add(const HomeStarted());
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = ComulineTheme.of(context);
-
-    return BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
-      return SafeArea(
-        child: Scaffold(
-          body: GestureDetector(
-            onTap: () => _releaseFocus(context),
-            child: CustomScrollView(
-              slivers: [
-                CustomAppBar(onThemeToggleTap: widget.onThemeToggleTap),
-                SliverAppBar(
-                  pinned: true,
-                  floating: true,
-                  surfaceTintColor: Colors.grey.shade500,
-                  flexibleSpace: const FlexibleSpaceBar(
-                    titlePadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    title: CustomSearchBar(),
+    return SafeArea(
+      child: Scaffold(
+        body: GestureDetector(
+          onTap: () => _releaseFocus(context),
+          child: CustomScrollView(
+            slivers: [
+              CustomAppBar(onThemeToggleTap: widget.onThemeToggleTap),
+              SliverAppBar(
+                pinned: true,
+                floating: true,
+                surfaceTintColor: Colors.grey.shade500,
+                flexibleSpace: const FlexibleSpaceBar(
+                  titlePadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
                   ),
+                  title: CustomSearchBar(),
                 ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    childCount: state.stations.length,
-                    (context, index) {
-                      final station = state.stations[index];
-
-                      return ExpansionTile(
-                        iconColor:
-                            theme.materialThemeData.listTileTheme.iconColor,
-                        shape: const Border(),
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Stasiun',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey.shade700,
-                              ),
-                            ),
-                            Text(
-                              station.name,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        children: const [
-                          Text('data'),
-                          Text('data'),
-                          Text('data'),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          floatingActionButton: FloatingActionButton.small(
-            onPressed: () {
-              // TODO
-            },
-            foregroundColor: Colors.grey.shade600,
-            backgroundColor: Colors.grey.shade600,
-            child: const Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
+              ),
+              const StationList(),
+            ],
           ),
         ),
-      );
-    });
+        floatingActionButton: FloatingActionButton.small(
+          onPressed: () => _bloc.add(const HomeRefresh()),
+          foregroundColor: Colors.grey.shade600,
+          backgroundColor: Colors.grey.shade600,
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
   }
 
   _releaseFocus(BuildContext context) => FocusScope.of(context).unfocus();
+}
+
+class StationList extends StatelessWidget {
+  const StationList({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ComulineTheme.of(context);
+
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
+        return SliverList(
+          delegate: SliverChildBuilderDelegate(
+            childCount: state.stations.length,
+            (context, index) {
+              final station = state.stations[index];
+              return ExpansionTile(
+                iconColor: theme.materialThemeData.listTileTheme.iconColor,
+                shape: const Border(),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Stasiun',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    Text(
+                      station.name,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                children: const [
+                  Text('data'),
+                  Text('data'),
+                  Text('data'),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
 }
 
 class CustomAppBar extends StatelessWidget {
