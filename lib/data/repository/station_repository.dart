@@ -1,6 +1,6 @@
 import 'package:comuline/models/station.dart';
 
-class Repository {
+class StationRepository {
   Stream<List<Station>> getStations() async* {
     final stations = <Station>[];
     for (var i = 0; i < 3; i++) {

@@ -1,4 +1,4 @@
-import 'package:comuline/data/repository.dart';
+import 'package:comuline/data/repository/station_repository.dart';
 import 'package:comuline/models/station.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,7 +8,7 @@ part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc({
-    required Repository repository,
+    required StationRepository repository,
   })  : _repository = repository,
         super(const HomeState()) {
     on<HomeEvent>((event, emitter) async {
@@ -21,7 +21,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     });
   }
 
-  final Repository _repository;
+  final StationRepository _repository;
 
   Future<void> _getStations(
     Emitter emitter,
@@ -35,7 +35,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     return emitter.onEach<HomeState>(
       streamOfStations,
-      onData: emitter,
+      onData: emitter.call,
     );
   }
 }
