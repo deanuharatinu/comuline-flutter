@@ -1,4 +1,4 @@
-import 'package:comuline/data/remote/result.dart';
+import 'package:comuline/models/result.dart';
 import 'package:comuline/data/repository/station_repository.dart';
 import 'package:comuline/models/exceptions.dart';
 import 'package:comuline/models/station.dart';

@@ -1,10 +1,7 @@
-import 'package:chopper/chopper.dart';
 import 'package:comuline/component_library/theme/comuline_theme.dart';
 import 'package:comuline/component_library/theme/comuline_theme_data.dart';
 import 'package:comuline/component_library/theme/dark_mode_preference.dart';
-import 'package:comuline/data/remote/api_service.dart';
-import 'package:comuline/data/remote/remote_source.dart';
-import 'package:comuline/data/repository/station_repository.dart';
+import 'package:comuline/di/repository_injector.dart';
 import 'package:comuline/features/home/view/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart' as logging;
@@ -32,17 +29,7 @@ class Comuline extends StatefulWidget {
 class _ComulineState extends State<Comuline> {
   var darkModePreference = DarkModePreference.alwaysLight;
 
-  late final _chopper = ChopperClient(
-    converter: const JsonConverter(),
-    errorConverter: const JsonConverter(),
-    interceptors: [
-      HttpLoggingInterceptor(),
-    ],
-  );
-  late final _apiService = ApiService.create(_chopper);
-
-  late final _remoteSource = RemoteSource(apiService: _apiService);
-  late final _repository = StationRepository(remoteSource: _remoteSource);
+  late final _repository = RepositoryInjector.injectStationRepository();
 
   @override
   Widget build(BuildContext context) {

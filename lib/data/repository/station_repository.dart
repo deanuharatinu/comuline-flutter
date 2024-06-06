@@ -1,5 +1,5 @@
 import 'package:comuline/data/remote/remote_source.dart';
-import 'package:comuline/data/remote/result.dart';
+import 'package:comuline/models/result.dart';
 import 'package:comuline/models/station.dart';
 
 class StationRepository {

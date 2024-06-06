@@ -5,7 +5,7 @@ import 'package:comuline/component_library/extensions/value_utils.dart';
 import 'package:comuline/data/remote/api_service.dart';
 import 'package:comuline/data/remote/model/response/base_remote.dart';
 import 'package:comuline/data/remote/model/response/station_remote.dart';
-import 'package:comuline/data/remote/result.dart';
+import 'package:comuline/models/result.dart';
 import 'package:comuline/models/exceptions.dart';
 import 'package:comuline/models/station.dart';
 
