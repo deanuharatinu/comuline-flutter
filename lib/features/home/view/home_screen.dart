@@ -1,6 +1,7 @@
 import 'package:comuline/component_library/theme/comuline_theme.dart';
 import 'package:comuline/data/repository/station_repository.dart';
 import 'package:comuline/features/home/bloc/home_bloc.dart';
+import 'package:comuline/models/exceptions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -74,7 +75,7 @@ class _HomeViewState extends State<HomeView> {
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton.small(
+        floatingActionButton: FloatingActionButton(
           onPressed: () => _bloc.add(const HomeRefresh()),
           foregroundColor: Colors.grey.shade600,
           backgroundColor: Colors.grey.shade600,
@@ -99,7 +100,28 @@ class StationList extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ComulineTheme.of(context);
 
-    return BlocBuilder<HomeBloc, HomeState>(
+    return BlocConsumer<HomeBloc, HomeState>(
+      listener: (context, state) {
+        if (state.error is NoConnectionException) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text("Connection Error"),
+              ),
+            );
+        } else if (state.error is Exception) {
+          final errorMessage = (state.error as Exception).toString();
+
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(errorMessage),
+              ),
+            );
+        }
+      },
       builder: (context, state) {
         return SliverList(
           delegate: SliverChildBuilderDelegate(

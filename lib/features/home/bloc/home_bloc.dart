@@ -1,4 +1,6 @@
+import 'package:comuline/data/remote/result.dart';
 import 'package:comuline/data/repository/station_repository.dart';
+import 'package:comuline/models/exceptions.dart';
 import 'package:comuline/models/station.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,15 +28,33 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Future<void> _getStations(
     Emitter emitter,
   ) async {
-    final streamOfStations = _repository.getStations().map((stations) {
+    final result = _repository.getStations();
+
+    var streamOfHomeState = result.map((convert) {
+      if (convert is Success<List<Station>>) {
+        final value = convert.value;
+        return HomeState(
+          status: HomeStatus.success,
+          stations: value,
+        );
+      } else if (convert is Error<List<Station>>) {
+        return HomeState(
+          status: HomeStatus.error,
+          error: convert.exception,
+          stations: const [],
+        );
+      }
+
+      // Unknown state
       return HomeState(
-        status: HomeStatus.success,
-        stations: stations,
+        status: HomeStatus.error,
+        error: UnknownException(),
+        stations: const [],
       );
     });
 
     return emitter.onEach<HomeState>(
-      streamOfStations,
+      streamOfHomeState,
       onData: emitter.call,
     );
   }
