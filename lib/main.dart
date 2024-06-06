@@ -1,15 +1,23 @@
 import 'package:comuline/component_library/theme/comuline_theme.dart';
 import 'package:comuline/component_library/theme/comuline_theme_data.dart';
 import 'package:comuline/component_library/theme/dark_mode_preference.dart';
+import 'package:comuline/data/repository/station_repository.dart';
 import 'package:comuline/di/repository_injector.dart';
 import 'package:comuline/features/home/view/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart' as logging;
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   _setupLogging();
 
-  runApp(const Comuline());
+  final StationRepository repository =
+      await RepositoryInjector.injectStationRepository();
+
+  runApp(Comuline(
+    stationRepository: repository,
+  ));
 }
 
 void _setupLogging() {
@@ -20,7 +28,12 @@ void _setupLogging() {
 }
 
 class Comuline extends StatefulWidget {
-  const Comuline({super.key});
+  const Comuline({
+    required StationRepository stationRepository,
+    super.key,
+  }) : _stationRepository = stationRepository;
+
+  final StationRepository _stationRepository;
 
   @override
   State<Comuline> createState() => _ComulineState();
@@ -28,8 +41,6 @@ class Comuline extends StatefulWidget {
 
 class _ComulineState extends State<Comuline> {
   var darkModePreference = DarkModePreference.alwaysLight;
-
-  late final _repository = RepositoryInjector.injectStationRepository();
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +57,8 @@ class _ComulineState extends State<Comuline> {
         theme: lightTheme.materialThemeData,
         darkTheme: darkTheme.materialThemeData,
         home: HomeScreen(
-          repository: _repository,
+          darkModePreference: darkModePreference,
+          repository: widget._stationRepository,
           onThemeToggleTap: () {
             setState(() {
               darkModePreference =
