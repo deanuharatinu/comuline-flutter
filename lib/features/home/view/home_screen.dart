@@ -148,6 +148,7 @@ class StationList extends StatelessWidget {
             (context, index) {
               final station = state.stations[index];
               return ExpansionTile(
+                key: PageStorageKey(station.id),
                 iconColor: theme.materialThemeData.listTileTheme.iconColor,
                 shape: const Border(),
                 title: Column(
