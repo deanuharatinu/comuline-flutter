@@ -1,13 +1,17 @@
 import 'package:comuline/component_library/theme/comuline_theme.dart';
+import 'package:comuline/component_library/theme/dark_mode_preference.dart';
+import 'package:comuline/component_library/theme/styled_status_bar.dart';
 import 'package:comuline/data/repository/station_repository.dart';
 import 'package:comuline/features/home/bloc/home_bloc.dart';
 import 'package:comuline/models/exceptions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
+    required this.darkModePreference,
     required this.repository,
     this.onThemeToggleTap,
     super.key,
@@ -15,6 +19,7 @@ class HomeScreen extends StatelessWidget {
 
   final StationRepository repository;
   final VoidCallback? onThemeToggleTap;
+  final DarkModePreference darkModePreference;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +28,7 @@ class HomeScreen extends StatelessWidget {
         repository: repository,
       ),
       child: HomeView(
+        darkModePreference: darkModePreference,
         onThemeToggleTap: onThemeToggleTap,
       ),
     );
@@ -31,11 +37,13 @@ class HomeScreen extends StatelessWidget {
 
 class HomeView extends StatefulWidget {
   const HomeView({
+    required this.darkModePreference,
     this.onThemeToggleTap,
     super.key,
   });
 
   final VoidCallback? onThemeToggleTap;
+  final DarkModePreference darkModePreference;
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -52,27 +60,37 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    final SystemUiOverlayStyle statusBarStyle;
+    if (widget.darkModePreference == DarkModePreference.alwaysLight) {
+      statusBarStyle = SystemUiOverlayStyle.dark;
+    } else {
+      statusBarStyle = SystemUiOverlayStyle.light;
+    }
+
+    return StyledStatusBar.dynamic(
+      statusBarStyle: statusBarStyle,
       child: Scaffold(
-        body: GestureDetector(
-          onTap: () => _releaseFocus(context),
-          child: CustomScrollView(
-            slivers: [
-              CustomAppBar(onThemeToggleTap: widget.onThemeToggleTap),
-              SliverAppBar(
-                pinned: true,
-                floating: true,
-                surfaceTintColor: Colors.grey.shade500,
-                flexibleSpace: const FlexibleSpaceBar(
-                  titlePadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+        body: SafeArea(
+          child: GestureDetector(
+            onTap: () => _releaseFocus(context),
+            child: CustomScrollView(
+              slivers: [
+                CustomAppBar(onThemeToggleTap: widget.onThemeToggleTap),
+                SliverAppBar(
+                  pinned: true,
+                  floating: true,
+                  surfaceTintColor: Colors.grey.shade500,
+                  flexibleSpace: const FlexibleSpaceBar(
+                    titlePadding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    title: CustomSearchBar(),
                   ),
-                  title: CustomSearchBar(),
                 ),
-              ),
-              const StationList(),
-            ],
+                const StationList(),
+              ],
+            ),
           ),
         ),
         floatingActionButton: FloatingActionButton(
@@ -201,7 +219,6 @@ class CustomAppBar extends StatelessWidget {
       actions: [
         IconButton(
           onPressed: () {
-            debugPrint('pencet');
             onThemeToggleTap?.call();
           },
           icon: Icon(

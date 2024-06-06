@@ -41,7 +41,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         return HomeState(
           status: HomeStatus.error,
           error: convert.exception,
-          stations: const [],
+          stations: state.stations,
         );
       }
 
