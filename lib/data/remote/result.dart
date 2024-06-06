@@ -7,7 +7,8 @@ class Success<T> extends Result<T> {
 }
 
 class Error<T> extends Result<T> {
-  final Exception exception;
+  final Exception? exception;
+  final T? value;
 
-  Error(this.exception);
+  Error({this.value, this.exception});
 }
