@@ -1,3 +1,4 @@
+import 'package:comuline/component_library/extensions/value_utils.dart';
 import 'package:comuline/component_library/theme/comuline_theme.dart';
 import 'package:comuline/component_library/theme/dark_mode_preference.dart';
 import 'package:comuline/component_library/theme/styled_status_bar.dart';
@@ -160,7 +161,7 @@ class StationList extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      station.name,
+                      station.name.capitalize,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
