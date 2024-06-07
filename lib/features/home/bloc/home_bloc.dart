@@ -27,6 +27,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Future<void> _getStations(
     Emitter emitter,
   ) async {
+    emitter(const HomeState(status: HomeStatus.loading));
+
     final result = _repository.getStations();
 
     var streamOfHomeState = result.map((convert) {

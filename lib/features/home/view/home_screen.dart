@@ -60,6 +60,13 @@ class _HomeViewState extends State<HomeView> {
     super.initState();
   }
 
+  Future<void> _refreshData() async {
+    _bloc.add(const HomeRefresh());
+    await for (final _ in _bloc.stream) {
+      break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final SystemUiOverlayStyle statusBarStyle;
@@ -92,12 +99,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
               CupertinoSliverRefreshControl(
-                onRefresh: () {
-                  _bloc.add(const HomeRefresh());
-
-                  final stateChangeFuture = _bloc.stream.first;
-                  return stateChangeFuture;
-                },
+                onRefresh: _refreshData,
               ),
               const StationList(),
             ],
@@ -149,43 +151,74 @@ class StationList extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            childCount: state.stations.length,
-            (context, index) {
-              final station = state.stations[index];
-              return ExpansionTile(
-                key: PageStorageKey(station.id),
-                iconColor: theme.materialThemeData.listTileTheme.iconColor,
-                shape: const Border(),
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Stasiun',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade700,
-                      ),
+        if (state.stations.isEmpty) {
+          return SliverFillRemaining(
+            fillOverscroll: true,
+            child: Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/ic_not_found.svg',
+                    height: 100,
+                    colorFilter: ColorFilter.mode(
+                      Colors.grey.shade500,
+                      BlendMode.srcIn,
                     ),
-                    Text(
-                      station.name.capitalize,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey.shade500,
                     ),
-                  ],
-                ),
-                children: const [
-                  Text('data'),
-                  Text('data'),
-                  Text('data'),
+                    'Anda tidak memiliki daftar stasiun',
+                  ),
                 ],
-              );
-            },
-          ),
-        );
+              ),
+            ),
+          );
+        } else {
+          return SliverList(
+            delegate: SliverChildBuilderDelegate(
+              childCount: state.stations.length,
+              (context, index) {
+                final station = state.stations[index];
+                return ExpansionTile(
+                  key: PageStorageKey(station.id),
+                  iconColor: theme.materialThemeData.listTileTheme.iconColor,
+                  shape: const Border(),
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Stasiun',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                      Text(
+                        station.name.capitalize,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  children: const [
+                    Text('data'),
+                    Text('data'),
+                    Text('data'),
+                  ],
+                );
+              },
+            ),
+          );
+        }
       },
     );
   }
