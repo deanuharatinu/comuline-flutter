@@ -15,8 +15,8 @@ class StationRepository {
 
   Stream<Result<List<Station>>> getStations() async* {
     // Get local data first
-    final localData = await _localSource.getStations();
-    if (localData.isNotEmpty) yield Success(localData) ;
+    var localData = await _localSource.getStations();
+    if (localData.isNotEmpty) yield Success(localData);
 
     // Fetch remote data
     final remoteData = await _remoteSource.getStations();
@@ -27,6 +27,8 @@ class StationRepository {
       await _localSource.upsertStations(value);
     }
 
-    yield remoteData;
+    // keep single source of truth: the local cache
+    localData = await _localSource.getStations();
+    yield Success(localData);
   }
 }
