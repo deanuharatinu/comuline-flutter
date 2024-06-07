@@ -17,7 +17,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       if (event is HomeStarted) {
         await _getStations(emitter);
       } else if (event is HomeRefresh) {
-        // TODO
         await _getStations(emitter);
       }
     });

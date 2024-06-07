@@ -5,6 +5,7 @@ import 'package:comuline/component_library/theme/styled_status_bar.dart';
 import 'package:comuline/data/repository/station_repository.dart';
 import 'package:comuline/features/home/bloc/home_bloc.dart';
 import 'package:comuline/models/exceptions.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -72,26 +73,34 @@ class _HomeViewState extends State<HomeView> {
       statusBarStyle: statusBarStyle,
       child: Scaffold(
         body: SafeArea(
-          child: GestureDetector(
-            onTap: () => _releaseFocus(context),
-            child: CustomScrollView(
-              slivers: [
-                CustomAppBar(onThemeToggleTap: widget.onThemeToggleTap),
-                SliverAppBar(
-                  pinned: true,
-                  floating: true,
-                  surfaceTintColor: Colors.grey.shade500,
-                  flexibleSpace: const FlexibleSpaceBar(
-                    titlePadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    title: CustomSearchBar(),
-                  ),
-                ),
-                const StationList(),
-              ],
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
             ),
+            slivers: [
+              CustomAppBar(onThemeToggleTap: widget.onThemeToggleTap),
+              SliverAppBar(
+                pinned: true,
+                floating: true,
+                surfaceTintColor: Colors.grey.shade500,
+                flexibleSpace: const FlexibleSpaceBar(
+                  titlePadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  title: CustomSearchBar(),
+                ),
+              ),
+              CupertinoSliverRefreshControl(
+                onRefresh: () {
+                  _bloc.add(const HomeRefresh());
+
+                  final stateChangeFuture = _bloc.stream.first;
+                  return stateChangeFuture;
+                },
+              ),
+              const StationList(),
+            ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
@@ -106,8 +115,6 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
-
-  _releaseFocus(BuildContext context) => FocusScope.of(context).unfocus();
 }
 
 class StationList extends StatelessWidget {
