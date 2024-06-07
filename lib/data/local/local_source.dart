@@ -1,7 +1,6 @@
 import 'package:comuline/component_library/extensions/value_utils.dart';
 import 'package:comuline/data/local/model/station_local.dart';
 import 'package:comuline/models/station.dart';
-import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 
 class LocalSource {
@@ -12,11 +11,12 @@ class LocalSource {
   final Isar _dbService;
 
   Future<List<Station>> getStations() async {
-    final stationsLocalList = await _dbService.stationLocals.where().findAll();
+    final stationsLocalList =
+        await _dbService.stationLocals.where().sortById().findAll();
 
     return stationsLocalList.map((stationLocal) {
       return Station(
-        id: stationLocal.stationId.orEmpty,
+        id: stationLocal.id.orEmpty,
         name: stationLocal.name.orEmpty,
         daop: stationLocal.daop.orInt(0),
         fgEnable: stationLocal.fgEnable.orInt(0),
@@ -29,7 +29,7 @@ class LocalSource {
   Future<bool> upsertStations(List<Station> stations) async {
     final stationLocalList = stations.map((station) {
       return StationLocal()
-        ..stationId = station.id
+        ..id = station.id
         ..daop = station.daop
         ..fgEnable = station.fgEnable
         ..haveSchedule = station.haveSchedule
@@ -37,11 +37,9 @@ class LocalSource {
         ..updatedAt = station.updatedAt;
     }).toList();
 
-    final result = await _dbService.writeTxn(() async {
+    await _dbService.writeTxn(() async {
       return await _dbService.stationLocals.putAll(stationLocalList);
     });
-
-    debugPrint(result.length.toString());
 
     return true;
   }
