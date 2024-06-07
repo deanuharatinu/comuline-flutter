@@ -14,3 +14,24 @@ extension StringManipulator on String {
     return text[0].toUpperCase() + text.substring(1).toLowerCase();
   }
 }
+
+extension HashHelper on dynamic {
+  int get fastHash {
+    if (this is String) {
+      var hash = 0xcbf29ce484222325;
+
+      var i = 0;
+      while (i < this.length) {
+        final codeUnit = this.codeUnitAt(i++);
+        hash ^= codeUnit >> 8;
+        hash *= 0x100000001b3;
+        hash ^= codeUnit & 0xFF;
+        hash *= 0x100000001b3;
+      }
+
+      return hash;
+    }
+
+    return 0;
+  }
+}
