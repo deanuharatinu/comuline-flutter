@@ -14,3 +14,9 @@ class HomeStarted extends HomeEvent {
 class HomeRefresh extends HomeEvent {
   const HomeRefresh();
 }
+
+class HomeStationDetailPressed extends HomeEvent {
+  const HomeStationDetailPressed(this.stationId);
+
+  final String stationId;
+}

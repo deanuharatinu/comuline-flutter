@@ -10,4 +10,7 @@ abstract class ApiService extends ChopperService {
 
   @Get(path: "v1/station/")
   Future<Response> getStations();
+
+  @Get(path: "v1/schedule/{stationId}")
+  Future<Response> getStationDetailById(@Path() String stationId);
 }

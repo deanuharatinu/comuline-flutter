@@ -1,3 +1,5 @@
+import 'package:comuline/models/station_detail.dart';
+
 class Station {
   Station({
     required this.id,
@@ -6,6 +8,7 @@ class Station {
     required this.fgEnable,
     required this.haveSchedule,
     required this.updatedAt,
+    this.stationDetails,
   });
 
   final String id;
@@ -14,4 +17,5 @@ class Station {
   final int fgEnable;
   final bool haveSchedule;
   final String updatedAt;
+  final List<StationDetail>? stationDetails;
 }

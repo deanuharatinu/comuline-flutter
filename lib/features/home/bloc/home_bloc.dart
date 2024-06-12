@@ -18,6 +18,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         await _getStations(emitter);
       } else if (event is HomeRefresh) {
         await _getStations(emitter);
+      } else if (event is HomeStationDetailPressed) {
+        await _getStationDetailById(event.stationId);
       }
     });
   }
@@ -58,5 +60,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       streamOfHomeState,
       onData: emitter.call,
     );
+  }
+  
+  Future<void> _getStationDetailById(String stationId) {
+    final result = _repository.getStationDetailById(stationId);
+    
+    return Future.value();
   }
 }

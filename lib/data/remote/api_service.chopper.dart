@@ -27,4 +27,16 @@ final class _$ApiService extends ApiService {
     );
     return client.send<dynamic, dynamic>($request);
   }
+
+  @override
+  Future<Response<dynamic>> getStationDetailById(String stationId) {
+    final Uri $url =
+        Uri.parse('https://www.api.comuline.com/v1/schedule/${stationId}');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client.send<dynamic, dynamic>($request);
+  }
 }

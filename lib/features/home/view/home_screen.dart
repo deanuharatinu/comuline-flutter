@@ -126,6 +126,7 @@ class StationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<HomeBloc>();
     final theme = ComulineTheme.of(context);
 
     return BlocConsumer<HomeBloc, HomeState>(
@@ -154,30 +155,28 @@ class StationList extends StatelessWidget {
         if (state.stations.isEmpty) {
           return SliverFillRemaining(
             fillOverscroll: true,
-            child: Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/ic_not_found.svg',
-                    height: 100,
-                    colorFilter: ColorFilter.mode(
-                      Colors.grey.shade500,
-                      BlendMode.srcIn,
-                    ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/ic_not_found.svg',
+                  height: 100,
+                  colorFilter: ColorFilter.mode(
+                    Colors.grey.shade500,
+                    BlendMode.srcIn,
                   ),
-                  const SizedBox(
-                    height: 20,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey.shade500,
                   ),
-                  Text(
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey.shade500,
-                    ),
-                    'Anda tidak memiliki daftar stasiun',
-                  ),
-                ],
-              ),
+                  'Anda tidak memiliki daftar stasiun',
+                ),
+              ],
             ),
           );
         } else {
@@ -209,10 +208,20 @@ class StationList extends StatelessWidget {
                       ),
                     ],
                   ),
-                  children: const [
-                    Text('data'),
-                    Text('data'),
-                    Text('data'),
+                  onExpansionChanged: (isExpanded) {
+                    if (isExpanded) {
+                      // TODO harus dijagain biar nggak dipencet2 terus
+                      
+                      bloc.add(
+                        HomeStationDetailPressed(station.id),
+                      );
+                    }
+                  },
+                  children: [
+                    if (station.stationDetails == null)
+                      const CircularProgressIndicator(),
+                    if (station.stationDetails != null)
+                      const Text('Halo World'),
                   ],
                 );
               },

@@ -31,4 +31,10 @@ class StationRepository {
     localData = await _localSource.getStations();
     yield Success(localData);
   }
+
+  Future<void> getStationDetailById(String stationId) async {
+    final remoteData = await _remoteSource.getStationDetailById(stationId);
+
+    
+  }
 }
