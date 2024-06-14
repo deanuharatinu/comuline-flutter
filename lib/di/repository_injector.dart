@@ -4,6 +4,7 @@ import 'package:comuline/di/factory/api_service_factory.dart';
 import 'package:comuline/di/factory/chopper_factory.dart';
 import 'package:comuline/di/factory/isar_factory.dart';
 import 'package:comuline/di/factory/repository_factory.dart';
+import 'package:pretty_chopper_logger/pretty_chopper_logger.dart';
 
 class RepositoryInjector {
   RepositoryInjector._();
@@ -16,7 +17,9 @@ class RepositoryInjector {
       converter: const JsonConverter(),
       errorConverter: const JsonConverter(),
       interceptors: [
-        HttpLoggingInterceptor(),
+        PrettyChopperLogger(
+          level: Level.body,
+        ),
       ],
     ).client;
     final apiService = ApiServiceFactory.create(client: client);
