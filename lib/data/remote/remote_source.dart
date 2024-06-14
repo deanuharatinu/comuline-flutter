@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:chopper/chopper.dart';
 import 'package:comuline/component_library/extensions/value_utils.dart';
 import 'package:comuline/data/remote/api_service.dart';
 import 'package:comuline/data/remote/model/response/base_remote.dart';
@@ -21,47 +22,33 @@ class RemoteSource {
   Future<Result<List<Station>>> getStations() async {
     try {
       final response = await _apiService.getStations();
-      final jsonObject = json.decode(response.bodyString);
 
-      final baseRemote = BaseRemote<StationRemote>.fromJson(
-        jsonObject,
-        (json) => StationRemote.fromJson(json as Map<String, dynamic>),
+      // Expecting response data in list of stations
+      return parseResponseList(
+        response: response,
+        isSuccessful: response.isSuccessful,
+        converter: () {
+          final jsonObject = json.decode(response.bodyString);
+          final baseRemote = BaseRemote<StationRemote>.fromJson(
+            jsonObject,
+            (json) => StationRemote.fromJson(json as Map<String, dynamic>),
+          );
+          final stationRemoteList = baseRemote.data ?? [];
+
+          final data = stationRemoteList
+              .map((stationRemote) => Station(
+                    id: stationRemote.id.orEmpty,
+                    name: stationRemote.name.orEmpty,
+                    daop: stationRemote.daop.orInt(0),
+                    fgEnable: stationRemote.fgEnable.orInt(0),
+                    haveSchedule: stationRemote.haveSchedule.orBool(false),
+                    updatedAt: stationRemote.updatedAt.orEmpty,
+                  ))
+              .toList();
+
+          return Future.value(Success(data));
+        },
       );
-
-      final stationRemoteList = baseRemote.data ?? [];
-
-      if (response.isSuccessful) {
-        final data = stationRemoteList
-            .map(
-              (stationRemote) => Station(
-                id: stationRemote.id.orEmpty,
-                name: stationRemote.name.orEmpty,
-                daop: stationRemote.daop.orInt(0),
-                fgEnable: stationRemote.fgEnable.orInt(0),
-                haveSchedule: stationRemote.haveSchedule.orBool(false),
-                updatedAt: stationRemote.updatedAt.orEmpty,
-              ),
-            )
-            .toList();
-
-        return Future.value(Success(data));
-      } else {
-        if (response.statusCode == 404) {
-          return Future.value(Error(value: [], exception: NotFoundException()));
-        }
-
-        // Client error
-        if (response.statusCode >= 400 && response.statusCode < 500) {
-          return Future.value(Error(value: [], exception: ClientException()));
-        }
-
-        // Server error
-        if (response.statusCode >= 400 && response.statusCode < 500) {
-          return Future.value(Error(value: [], exception: ServerException()));
-        }
-
-        return Future.value(Error(value: [], exception: UnknownException()));
-      }
     } on Exception catch (e) {
       if (e is SocketException) {
         return Future.value(Error(
@@ -75,6 +62,32 @@ class RemoteSource {
         value: [],
         exception: e,
       ));
+    }
+  }
+
+  Future<Result<List<OUT>>> parseResponseList<IN, OUT>({
+    required Response<dynamic> response,
+    required bool isSuccessful,
+    required Future<Result<List<OUT>>> Function() converter,
+  }) async {
+    if (isSuccessful) {
+      return converter();
+    } else {
+      if (response.statusCode == 404) {
+        return Future.value(Error(value: [], exception: NotFoundException()));
+      }
+
+      // Client error
+      if (response.statusCode >= 400 && response.statusCode < 500) {
+        return Future.value(Error(value: [], exception: ClientException()));
+      }
+
+      // Server error
+      if (response.statusCode >= 400 && response.statusCode < 500) {
+        return Future.value(Error(value: [], exception: ServerException()));
+      }
+
+      return Future.value(Error(value: [], exception: UnknownException()));
     }
   }
 
