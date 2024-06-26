@@ -14,12 +14,10 @@ import 'package:flutter_svg/svg.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
     required this.darkModePreference,
-    required this.repository,
     this.onThemeToggleTap,
     super.key,
   });
 
-  final StationRepository repository;
   final VoidCallback? onThemeToggleTap;
   final DarkModePreference darkModePreference;
 
@@ -27,7 +25,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => HomeBloc(
-        repository: repository,
+        repository: RepositoryProvider.of<StationRepository>(context),
       ),
       child: HomeView(
         darkModePreference: darkModePreference,
@@ -211,7 +209,7 @@ class StationList extends StatelessWidget {
                   onExpansionChanged: (isExpanded) {
                     if (isExpanded) {
                       // TODO harus dijagain biar nggak dipencet2 terus
-                      
+
                       bloc.add(
                         HomeStationDetailPressed(station.id),
                       );
@@ -219,7 +217,10 @@ class StationList extends StatelessWidget {
                   },
                   children: [
                     if (station.stationDetails == null)
-                      const CircularProgressIndicator(),
+                      Container(
+                        padding: EdgeInsets.all(4),
+                        child: CircularProgressIndicator(),
+                      ),
                     if (station.stationDetails != null)
                       const Text('Halo World'),
                   ],
