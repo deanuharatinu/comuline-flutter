@@ -47,6 +47,8 @@ dependencies:
   isar_flutter_libs:
     version: *isar_version
     hosted: https://pub.isar-community.dev/
+  rxdart: ^0.28.0
+  bloc_concurrency: ^0.2.5
 
 dev_dependencies:
   flutter_test:
