@@ -29,13 +29,20 @@ final class _$ApiService extends ApiService {
   }
 
   @override
-  Future<Response<dynamic>> getStationDetailById(String stationId) {
+  Future<Response<dynamic>> getStationDetailById(
+    String stationId, {
+    bool isFromNow = true,
+  }) {
     final Uri $url =
         Uri.parse('https://www.api.comuline.com/v1/schedule/${stationId}');
+    final Map<String, dynamic> $params = <String, dynamic>{
+      'is_from_now': isFromNow
+    };
     final Request $request = Request(
       'GET',
       $url,
       client.baseUrl,
+      parameters: $params,
     );
     return client.send<dynamic, dynamic>($request);
   }

@@ -12,5 +12,8 @@ abstract class ApiService extends ChopperService {
   Future<Response> getStations();
 
   @Get(path: "v1/schedule/{stationId}")
-  Future<Response> getStationDetailById(@Path() String stationId);
+  Future<Response> getStationDetailById(
+    @Path() String stationId, {
+    @Query("is_from_now") bool isFromNow = true,
+  });
 }
