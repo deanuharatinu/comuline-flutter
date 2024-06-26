@@ -1,9 +1,12 @@
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:comuline/models/result.dart';
 import 'package:comuline/data/repository/station_repository.dart';
 import 'package:comuline/models/exceptions.dart';
 import 'package:comuline/models/station.dart';
+import 'package:comuline/models/station_detail.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rxdart/rxdart.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
@@ -13,15 +16,34 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required StationRepository repository,
   })  : _repository = repository,
         super(const HomeState()) {
-    on<HomeEvent>((event, emitter) async {
-      if (event is HomeStarted) {
-        await _getStations(emitter);
-      } else if (event is HomeRefresh) {
-        await _getStations(emitter);
-      } else if (event is HomeStationDetailPressed) {
-        await _getStationDetailById(event.stationId);
-      }
-    });
+    on<HomeEvent>(
+      (event, emitter) async {
+        if (event is HomeStarted) {
+          await _getStations(emitter);
+        } else if (event is HomeRefresh) {
+          await _getStations(emitter);
+        } else if (event is HomeStationDetailPressed) {
+          await _getStationDetailById(event.stationId, emitter);
+        }
+      },
+      transformer: (events, mapper) {
+        final nonDebounceEventStream = events.where(
+          (event) => event is! HomeStationDetailPressed,
+        );
+
+        final debounceEventStream = events
+            .whereType<HomeStationDetailPressed>()
+            .debounceTime(const Duration(seconds: 1));
+
+        final mergedEventStream = MergeStream([
+          nonDebounceEventStream,
+          debounceEventStream,
+        ]);
+
+        final restartableTransformer = restartable<HomeEvent>();
+        return restartableTransformer(mergedEventStream, mapper);
+      },
+    );
   }
 
   final StationRepository _repository;
@@ -61,10 +83,28 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       onData: emitter.call,
     );
   }
-  
-  Future<void> _getStationDetailById(String stationId) {
-    final result = _repository.getStationDetailById(stationId);
-    
-    return Future.value();
+
+  Future<void> _getStationDetailById(
+    String stationId,
+    Emitter emitter,
+  ) async {
+    final result = await _repository.getStationDetailById(stationId);
+
+    if (result is Success<List<StationDetail>>) {
+      final homeState = HomeState(
+        status: HomeStatus.success,
+        stations: state.stations.map((station) {
+          if (station.id == stationId) {
+            return station.copyWithStationDetails(result.value);
+          }
+
+          return station;
+        }).toList(),
+      );
+
+      emitter(homeState);
+    } else {
+      Future.value();
+    }
   }
 }

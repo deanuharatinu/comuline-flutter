@@ -2,6 +2,7 @@ import 'package:comuline/data/local/local_source.dart';
 import 'package:comuline/data/remote/remote_source.dart';
 import 'package:comuline/models/result.dart';
 import 'package:comuline/models/station.dart';
+import 'package:comuline/models/station_detail.dart';
 
 class StationRepository {
   StationRepository({
@@ -29,12 +30,19 @@ class StationRepository {
 
     // keep single source of truth: the local cache
     localData = await _localSource.getStations();
-    yield Success(localData);
+
+    // propagate error if any
+    if (remoteData is Error<dynamic>) {
+      final exception = (remoteData as Error<dynamic>).exception;
+      yield Error(value: localData, exception: exception);
+    } else {
+      yield Success(localData);
+    }
   }
 
-  Future<void> getStationDetailById(String stationId) async {
-    final remoteData = await _remoteSource.getStationDetailById(stationId);
-
-    
+  Future<Result<List<StationDetail>>> getStationDetailById(
+    String stationId,
+  ) async {
+    return await _remoteSource.getStationDetailById(stationId);
   }
 }

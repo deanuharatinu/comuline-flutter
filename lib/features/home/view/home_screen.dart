@@ -150,84 +150,100 @@ class StationList extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        if (state.stations.isEmpty) {
+        if (state.status == HomeStatus.loading) {
           return SliverFillRemaining(
             fillOverscroll: true,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SvgPicture.asset(
-                  'assets/icons/ic_not_found.svg',
-                  height: 100,
-                  colorFilter: ColorFilter.mode(
-                    Colors.grey.shade500,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey.shade500,
-                  ),
-                  'Anda tidak memiliki daftar stasiun',
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  child: const CircularProgressIndicator(),
                 ),
               ],
             ),
           );
         } else {
-          return SliverList(
-            delegate: SliverChildBuilderDelegate(
-              childCount: state.stations.length,
-              (context, index) {
-                final station = state.stations[index];
-                return ExpansionTile(
-                  key: PageStorageKey(station.id),
-                  iconColor: theme.materialThemeData.listTileTheme.iconColor,
-                  shape: const Border(),
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Stasiun',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade700,
-                        ),
-                      ),
-                      Text(
-                        station.name.capitalize,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+          if (state.stations.isEmpty) {
+            return SliverFillRemaining(
+              fillOverscroll: true,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/ic_not_found.svg',
+                    height: 100,
+                    colorFilter: ColorFilter.mode(
+                      Colors.grey.shade500,
+                      BlendMode.srcIn,
+                    ),
                   ),
-                  onExpansionChanged: (isExpanded) {
-                    if (isExpanded) {
-                      // TODO harus dijagain biar nggak dipencet2 terus
-
-                      bloc.add(
-                        HomeStationDetailPressed(station.id),
-                      );
-                    }
-                  },
-                  children: [
-                    if (station.stationDetails == null)
-                      Container(
-                        padding: EdgeInsets.all(4),
-                        child: CircularProgressIndicator(),
-                      ),
-                    if (station.stationDetails != null)
-                      const Text('Halo World'),
-                  ],
-                );
-              },
-            ),
-          );
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey.shade500,
+                    ),
+                    'Anda tidak memiliki daftar stasiun',
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return SliverList(
+              delegate: SliverChildBuilderDelegate(
+                childCount: state.stations.length,
+                (context, index) {
+                  final station = state.stations[index];
+                  return ExpansionTile(
+                    key: PageStorageKey(station.id),
+                    iconColor: theme.materialThemeData.listTileTheme.iconColor,
+                    shape: const Border(),
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Stasiun',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                        Text(
+                          station.name.capitalize,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    onExpansionChanged: (isExpanded) {
+                      if (isExpanded) {
+                        bloc.add(
+                          HomeStationDetailPressed(station.id),
+                        );
+                      }
+                    },
+                    children: [
+                      if (station.stationDetails.isEmpty)
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          child: const CircularProgressIndicator(),
+                        ),
+                      if (station.stationDetails.isNotEmpty)
+                        Text(station.stationDetails
+                            .map((detail) => detail.destination)
+                            .toList()
+                            .toString()),
+                    ],
+                  );
+                },
+              ),
+            );
+          }
         }
       },
     );
