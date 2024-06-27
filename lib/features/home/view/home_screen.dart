@@ -7,6 +7,7 @@ import 'package:comuline/features/home/bloc/home_bloc.dart';
 import 'package:comuline/features/home/widget/custom_app_bar.dart';
 import 'package:comuline/features/home/widget/custom_search_bar.dart';
 import 'package:comuline/models/exceptions.dart';
+import 'package:comuline/models/station.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -126,9 +127,6 @@ class StationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<HomeBloc>();
-    final theme = ComulineTheme.of(context);
-
     return BlocConsumer<HomeBloc, HomeState>(
       listener: (context, state) {
         if (state.error is NoConnectionException) {
@@ -155,101 +153,136 @@ class StationList extends StatelessWidget {
         if (state.status == HomeStatus.loading) {
           // TODO shimmer effect
 
-          return SliverFillRemaining(
-            fillOverscroll: true,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          return const LoadingStationList();
+        }
+
+        if (state.stations.isEmpty) {
+          return const EmptyStationList();
+        } else {
+          return ShowStationList(stationList: state.stations);
+        }
+      },
+    );
+  }
+}
+
+class ShowStationList extends StatelessWidget {
+  const ShowStationList({
+    required stationList,
+    super.key,
+  }) : _stationList = stationList;
+
+  final List<Station> _stationList;
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = context.read<HomeBloc>();
+    final theme = ComulineTheme.of(context);
+
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        childCount: _stationList.length,
+        (context, index) {
+          final station = _stationList[index];
+          return ExpansionTile(
+            key: PageStorageKey(station.id),
+            iconColor: theme.materialThemeData.listTileTheme.iconColor,
+            shape: const Border(),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  'Stasiun',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade700,
+                  ),
+                ),
+                Text(
+                  station.name.capitalize,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            onExpansionChanged: (isExpanded) {
+              if (isExpanded) {
+                bloc.add(
+                  HomeStationDetailPressed(station.id),
+                );
+              }
+            },
+            children: [
+              if (station.stationDetails.isEmpty)
                 Container(
                   padding: const EdgeInsets.all(4),
                   child: const CircularProgressIndicator(),
                 ),
-              ],
-            ),
+              if (station.stationDetails.isNotEmpty)
+                Text(station.stationDetails
+                    .map((detail) => detail.destination)
+                    .toList()
+                    .toString()),
+            ],
           );
-        } else {
-          if (state.stations.isEmpty) {
-            return SliverFillRemaining(
-              fillOverscroll: true,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/ic_not_found.svg',
-                    height: 100,
-                    colorFilter: ColorFilter.mode(
-                      Colors.grey.shade500,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey.shade500,
-                    ),
-                    'Anda tidak memiliki daftar stasiun',
-                  ),
-                ],
-              ),
-            );
-          } else {
-            return SliverList(
-              delegate: SliverChildBuilderDelegate(
-                childCount: state.stations.length,
-                (context, index) {
-                  final station = state.stations[index];
-                  return ExpansionTile(
-                    key: PageStorageKey(station.id),
-                    iconColor: theme.materialThemeData.listTileTheme.iconColor,
-                    shape: const Border(),
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Stasiun',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade700,
-                          ),
-                        ),
-                        Text(
-                          station.name.capitalize,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    onExpansionChanged: (isExpanded) {
-                      if (isExpanded) {
-                        bloc.add(
-                          HomeStationDetailPressed(station.id),
-                        );
-                      }
-                    },
-                    children: [
-                      if (station.stationDetails.isEmpty)
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          child: const CircularProgressIndicator(),
-                        ),
-                      if (station.stationDetails.isNotEmpty)
-                        Text(station.stationDetails
-                            .map((detail) => detail.destination)
-                            .toList()
-                            .toString()),
-                    ],
-                  );
-                },
-              ),
-            );
-          }
-        }
-      },
+        },
+      ),
+    );
+  }
+}
+
+class LoadingStationList extends StatelessWidget {
+  const LoadingStationList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverFillRemaining(
+      fillOverscroll: true,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(4),
+            child: const CircularProgressIndicator(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class EmptyStationList extends StatelessWidget {
+  const EmptyStationList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverFillRemaining(
+      fillOverscroll: true,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset(
+            'assets/icons/ic_not_found.svg',
+            height: 100,
+            colorFilter: ColorFilter.mode(
+              Colors.grey.shade500,
+              BlendMode.srcIn,
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Text(
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey.shade500,
+            ),
+            'Anda tidak memiliki daftar stasiun',
+          ),
+        ],
+      ),
     );
   }
 }
