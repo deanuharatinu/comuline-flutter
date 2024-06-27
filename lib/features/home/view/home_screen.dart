@@ -4,6 +4,8 @@ import 'package:comuline/component_library/theme/dark_mode_preference.dart';
 import 'package:comuline/component_library/theme/styled_status_bar.dart';
 import 'package:comuline/data/repository/station_repository.dart';
 import 'package:comuline/features/home/bloc/home_bloc.dart';
+import 'package:comuline/features/home/widget/custom_app_bar.dart';
+import 'package:comuline/features/home/widget/custom_search_bar.dart';
 import 'package:comuline/models/exceptions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -134,7 +136,7 @@ class StationList extends StatelessWidget {
             ..hideCurrentSnackBar()
             ..showSnackBar(
               const SnackBar(
-                content: Text("Connection Error"),
+                content: Text("Periksa koneksi internet Anda"),
               ),
             );
         } else if (state.error is Exception) {
@@ -151,6 +153,8 @@ class StationList extends StatelessWidget {
       },
       builder: (context, state) {
         if (state.status == HomeStatus.loading) {
+          // TODO shimmer effect
+
           return SliverFillRemaining(
             fillOverscroll: true,
             child: Column(
@@ -246,109 +250,6 @@ class StationList extends StatelessWidget {
           }
         }
       },
-    );
-  }
-}
-
-class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({
-    super.key,
-    this.onThemeToggleTap,
-    this.onSortTap,
-  });
-
-  final VoidCallback? onThemeToggleTap;
-  final VoidCallback? onSortTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverAppBar(
-      title: Row(
-        children: [
-          SvgPicture.asset(
-            'assets/icons/ic_comuline_logo.svg',
-            width: 26,
-            colorFilter: ColorFilter.mode(
-              Colors.grey.shade600,
-              BlendMode.srcIn,
-            ),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            'Comuline',
-            style: TextStyle(
-              fontFamily: 'GeistMono',
-              color: Colors.grey.shade600,
-              fontSize: 18,
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        IconButton(
-          onPressed: () {
-            onThemeToggleTap?.call();
-          },
-          icon: Icon(
-            Icons.dark_mode_outlined,
-            color: Colors.grey.shade600,
-          ),
-        ),
-        IconButton(
-          onPressed: onSortTap,
-          icon: Icon(
-            Icons.swap_vert,
-            color: Colors.grey.shade600,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class CustomSearchBar extends StatefulWidget {
-  const CustomSearchBar({super.key});
-
-  @override
-  State<StatefulWidget> createState() {
-    return _CustomSearchBar();
-  }
-}
-
-class _CustomSearchBar extends State<CustomSearchBar> {
-  final _searchBarFocusNode = FocusNode();
-
-  @override
-  void dispose() {
-    _searchBarFocusNode.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = ComulineTheme.of(context);
-
-    return SearchBar(
-      focusNode: _searchBarFocusNode,
-      shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(
-            borderRadius: const BorderRadius.all(Radius.circular(8)),
-            side: BorderSide(
-              color: theme.materialThemeData.colorScheme.onSurface,
-              width: 1,
-            )),
-      ),
-      backgroundColor: WidgetStatePropertyAll(
-        Colors.grey.shade400.withAlpha(20),
-      ),
-      elevation: const WidgetStatePropertyAll(0),
-      hintText: 'Cari stasiun keberangkatan',
-      leading: const Padding(
-        padding: EdgeInsets.only(left: 8),
-        child: Icon(
-          Icons.search,
-        ),
-      ),
     );
   }
 }
