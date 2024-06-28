@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 extension OrOther on dynamic {
   String get orEmpty => this ?? '';
   int orInt(int value) => this ?? value;
@@ -34,4 +36,11 @@ extension HashHelper on dynamic {
 
     return 0;
   }
+}
+
+Color hexToColor(String hexString) {
+  final buffer = StringBuffer();
+  if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+  buffer.write(hexString.replaceFirst('#', ''));
+  return Color(int.parse(buffer.toString(), radix: 16));
 }
