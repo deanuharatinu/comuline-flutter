@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 abstract class ComulineThemeData {
   ThemeData get materialThemeData;
+  LinearGradient get shimmerGradient;
 }
 
 class LightComulineThemeData extends ComulineThemeData {
@@ -23,6 +24,23 @@ class LightComulineThemeData extends ComulineThemeData {
           selectionHandleColor: Colors.grey.shade600,
         ),
       );
+
+  @override
+  LinearGradient get shimmerGradient => LinearGradient(
+        colors: [
+          Colors.grey.shade300,
+          const Color(0xFFF4F4F4),
+          Colors.grey.shade300,
+        ],
+        stops: const [
+          0.1,
+          0.3,
+          0.4,
+        ],
+        begin: const Alignment(-1.0, -0.3),
+        end: const Alignment(1.0, 0.3),
+        tileMode: TileMode.clamp,
+      );
 }
 
 class DarkComulineThemeData extends ComulineThemeData {
@@ -43,6 +61,23 @@ class DarkComulineThemeData extends ComulineThemeData {
           selectionColor: Colors.white60,
           selectionHandleColor: Colors.grey.shade700,
         ),
+      );
+
+  @override
+  LinearGradient get shimmerGradient => LinearGradient(
+        colors: [
+          Colors.grey.shade800,
+          Colors.grey.shade700,
+          Colors.grey.shade800,
+        ],
+        stops: const [
+          0.1,
+          0.3,
+          0.4,
+        ],
+        begin: const Alignment(-1.0, -0.3),
+        end: const Alignment(1.0, 0.3),
+        tileMode: TileMode.clamp,
       );
 }
 
