@@ -4,6 +4,8 @@ import 'package:comuline/component_library/theme/dark_mode_preference.dart';
 import 'package:comuline/component_library/theme/styled_status_bar.dart';
 import 'package:comuline/data/repository/station_repository.dart';
 import 'package:comuline/features/home/bloc/home_bloc.dart';
+import 'package:comuline/features/home/view/shimmer.dart';
+import 'package:comuline/features/home/widget/station_detail.dart';
 import 'package:comuline/features/home/widget/custom_app_bar.dart';
 import 'package:comuline/features/home/widget/custom_search_bar.dart';
 import 'package:comuline/models/exceptions.dart';
@@ -62,6 +64,9 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<void> _refreshData() async {
+    final isLoading = _bloc.state.status == HomeStatus.loading;
+    if (isLoading) return;
+
     _bloc.add(const HomeRefresh());
     await for (final _ in _bloc.stream) {
       break;
@@ -121,9 +126,7 @@ class _HomeViewState extends State<HomeView> {
 }
 
 class StationList extends StatelessWidget {
-  const StationList({
-    super.key,
-  });
+  const StationList({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -151,15 +154,15 @@ class StationList extends StatelessWidget {
       },
       builder: (context, state) {
         if (state.status == HomeStatus.loading) {
-          // TODO shimmer effect
-
           return const LoadingStationList();
         }
 
         if (state.stations.isEmpty) {
           return const EmptyStationList();
         } else {
-          return ShowStationList(stationList: state.stations);
+          return ShowStationList(
+            stationList: state.stations,
+          );
         }
       },
     );
@@ -179,55 +182,71 @@ class ShowStationList extends StatelessWidget {
     final bloc = context.read<HomeBloc>();
     final theme = ComulineTheme.of(context);
 
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        childCount: _stationList.length,
-        (context, index) {
-          final station = _stationList[index];
-          return ExpansionTile(
-            key: PageStorageKey(station.id),
-            iconColor: theme.materialThemeData.listTileTheme.iconColor,
-            shape: const Border(),
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return SliverPadding(
+      padding: const EdgeInsets.only(bottom: 80.0),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          childCount: _stationList.length,
+          (context, index) {
+            final station = _stationList[index];
+            return ExpansionTile(
+              expandedCrossAxisAlignment: CrossAxisAlignment.start,
+              key: PageStorageKey(station.id),
+              iconColor: theme.materialThemeData.listTileTheme.iconColor,
+              shape: const Border(),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Stasiun',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                  Text(
+                    station.name.capitalize,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              onExpansionChanged: (isExpanded) {
+                if (isExpanded) {
+                  bloc.add(
+                    HomeStationDetailPressed(station.id),
+                  );
+                }
+              },
               children: [
-                Text(
-                  'Stasiun',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade700,
+                if (station.destinationDetail.isEmpty)
+                  Shimmer(
+                    linearGradient: theme.shimmerGradient,
+                    child: ShimmerLoading(
+                      isLoading: true,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Container(
+                          height: 60,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6),
+                            color: Colors.white,
+                          ),
+                          width: double.infinity,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                Text(
-                  station.name.capitalize,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                if (station.destinationDetail.isNotEmpty)
+                  StationDetail(
+                    destinationDetail: station.destinationDetail,
                   ),
-                ),
               ],
-            ),
-            onExpansionChanged: (isExpanded) {
-              if (isExpanded) {
-                bloc.add(
-                  HomeStationDetailPressed(station.id),
-                );
-              }
-            },
-            children: [
-              if (station.stationDetails.isEmpty)
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  child: const CircularProgressIndicator(),
-                ),
-              if (station.stationDetails.isNotEmpty)
-                Text(station.stationDetails
-                    .map((detail) => detail.destination)
-                    .toList()
-                    .toString()),
-            ],
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -238,16 +257,33 @@ class LoadingStationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ComulineTheme.of(context);
+
     return SliverFillRemaining(
       fillOverscroll: true,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(4),
-            child: const CircularProgressIndicator(),
-          ),
-        ],
+      child: ListView.builder(
+        itemBuilder: (context, index) {
+          return Shimmer(
+            linearGradient: theme.shimmerGradient,
+            child: ShimmerLoading(
+              isLoading: true,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 6,
+                ),
+                child: Container(
+                  height: 70,
+                  decoration: BoxDecoration(
+                    color: Colors.yellow,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+        itemCount: 4,
       ),
     );
   }

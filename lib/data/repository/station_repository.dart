@@ -1,5 +1,6 @@
 import 'package:comuline/data/local/local_source.dart';
 import 'package:comuline/data/remote/remote_source.dart';
+import 'package:comuline/models/destination_detail.dart';
 import 'package:comuline/models/result.dart';
 import 'package:comuline/models/station.dart';
 import 'package:comuline/models/station_detail.dart';
@@ -40,9 +41,39 @@ class StationRepository {
     }
   }
 
-  Future<Result<List<StationDetail>>> getStationDetailById(
+  Future<Result<List<DestinationDetail>>> getStationDetailById(
     String stationId,
   ) async {
-    return await _remoteSource.getStationDetailById(stationId);
+    final result = await _remoteSource.getStationDetailById(stationId);
+    final Map<String, List<StationDetail>> groupedDestination = {};
+
+    if (result is Success<List<StationDetail>>) {
+      for (var stationDetail in result.value) {
+        // Group by destination & color
+        final key = '${stationDetail.destination} ${stationDetail.color}';
+        if (!groupedDestination.containsKey(key)) {
+          groupedDestination[key] = [];
+        }
+
+        groupedDestination[key]!.add(stationDetail);
+      }
+
+      final destinationDetailList = <DestinationDetail>[];
+      groupedDestination.forEach((key, value) {
+        final destinationDetail = DestinationDetail(
+          destination: value.first.destination,
+          color: value.first.color,
+          timeEstimated: value.map((detail) => detail.destinationTime).toList(),
+        );
+        destinationDetailList.add(destinationDetail);
+      });
+
+      return Success(destinationDetailList);
+    } else {
+      return Error(
+        value: [],
+        exception: (result as Error).exception,
+      );
+    }
   }
 }

@@ -1,9 +1,9 @@
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:comuline/models/destination_detail.dart';
 import 'package:comuline/models/result.dart';
 import 'package:comuline/data/repository/station_repository.dart';
 import 'package:comuline/models/exceptions.dart';
 import 'package:comuline/models/station.dart';
-import 'package:comuline/models/station_detail.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rxdart/rxdart.dart';
@@ -90,12 +90,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     final result = await _repository.getStationDetailById(stationId);
 
-    if (result is Success<List<StationDetail>>) {
+    if (result is Success<List<DestinationDetail>>) {
       final homeState = HomeState(
         status: HomeStatus.success,
         stations: state.stations.map((station) {
           if (station.id == stationId) {
-            return station.copyWithStationDetails(result.value);
+            return station.copyWithdestinationDetail(result.value);
           }
 
           return station;

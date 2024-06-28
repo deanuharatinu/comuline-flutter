@@ -1,4 +1,4 @@
-import 'package:comuline/models/station_detail.dart';
+import 'package:comuline/models/destination_detail.dart';
 import 'package:equatable/equatable.dart';
 
 class Station extends Equatable {
@@ -9,7 +9,7 @@ class Station extends Equatable {
     required this.fgEnable,
     required this.haveSchedule,
     required this.updatedAt,
-    this.stationDetails = const [],
+    this.destinationDetail = const [],
   });
 
   final String id;
@@ -18,9 +18,11 @@ class Station extends Equatable {
   final int fgEnable;
   final bool haveSchedule;
   final String updatedAt;
-  final List<StationDetail> stationDetails;
+  final List<DestinationDetail> destinationDetail;
 
-  Station copyWithStationDetails(List<StationDetail> stationDetails) {
+  Station copyWithdestinationDetail(
+    List<DestinationDetail> destinationDetail,
+  ) {
     return Station(
       id: id,
       name: name,
@@ -28,7 +30,7 @@ class Station extends Equatable {
       fgEnable: fgEnable,
       haveSchedule: haveSchedule,
       updatedAt: updatedAt,
-      stationDetails: stationDetails,
+      destinationDetail: destinationDetail,
     );
   }
 
@@ -40,6 +42,6 @@ class Station extends Equatable {
         fgEnable,
         haveSchedule,
         updatedAt,
-        stationDetails,
+        destinationDetail,
       ];
 }
