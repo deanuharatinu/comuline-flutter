@@ -6,7 +6,7 @@ extension OrOther on dynamic {
   bool orBool(bool value) => this ?? value;
 }
 
-extension StringManipulator on String {
+extension StringUtils on String {
   String get capitalize {
     final splittedText = split(' ');
     return splittedText.map((word) => _capitalize(word)).join(' ');
@@ -15,9 +15,21 @@ extension StringManipulator on String {
   String _capitalize(String text) {
     return text[0].toUpperCase() + text.substring(1).toLowerCase();
   }
+
+  Color get hexToColor {
+    try {
+      final buffer = StringBuffer();
+      if (length == 6 || length == 7) buffer.write('ff');
+      buffer.write(replaceFirst('#', ''));
+      return Color(int.parse(buffer.toString(), radix: 16));
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+      return Colors.white;
+    }
+  }
 }
 
-extension HashHelper on dynamic {
+extension HashUtils on dynamic {
   int get fastHash {
     if (this is String) {
       var hash = 0xcbf29ce484222325;
@@ -36,11 +48,4 @@ extension HashHelper on dynamic {
 
     return 0;
   }
-}
-
-Color hexToColor(String hexString) {
-  final buffer = StringBuffer();
-  if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
-  buffer.write(hexString.replaceFirst('#', ''));
-  return Color(int.parse(buffer.toString(), radix: 16));
 }

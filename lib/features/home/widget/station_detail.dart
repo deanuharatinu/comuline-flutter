@@ -53,7 +53,7 @@ class StationSchedule extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             left: BorderSide(
-              color: hexToColor(destinationDetail.color),
+              color: destinationDetail.color.hexToColor,
               width: 3.0,
             ),
           ),
