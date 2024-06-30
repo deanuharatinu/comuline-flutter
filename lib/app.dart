@@ -1,3 +1,4 @@
+import 'package:alice/alice.dart';
 import 'package:comuline/component_library/theme/comuline_theme.dart';
 import 'package:comuline/component_library/theme/comuline_theme_data.dart';
 import 'package:comuline/component_library/theme/dark_mode_preference.dart';
@@ -9,10 +10,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class Comuline extends StatefulWidget {
   const Comuline({
     required StationRepository stationRepository,
+    required Alice alice,
     super.key,
-  }) : _stationRepository = stationRepository;
+  })  : _stationRepository = stationRepository,
+        _alice = alice;
 
   final StationRepository _stationRepository;
+  final Alice _alice;
 
   @override
   State<Comuline> createState() => _ComulineState();
@@ -32,6 +36,7 @@ class _ComulineState extends State<Comuline> {
       child: MaterialApp(
         title: 'Comuline',
         debugShowCheckedModeBanner: true,
+        navigatorKey: widget._alice.getNavigatorKey(),
         themeMode: darkModePreference.themeMode(),
         theme: lightTheme.materialThemeData,
         darkTheme: darkTheme.materialThemeData,
