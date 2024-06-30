@@ -4,6 +4,7 @@ import 'package:comuline/models/destination_detail.dart';
 import 'package:comuline/models/result.dart';
 import 'package:comuline/models/station.dart';
 import 'package:comuline/models/station_detail.dart';
+import 'package:intl/intl.dart';
 
 class StationRepository {
   StationRepository({
@@ -58,12 +59,15 @@ class StationRepository {
         groupedDestination[key]!.add(stationDetail);
       }
 
+      final dateTime = DateFormat('yyyy-MM-dd').format(DateTime.now());
       final destinationDetailList = <DestinationDetail>[];
       groupedDestination.forEach((key, value) {
         final destinationDetail = DestinationDetail(
           destination: value.first.destination,
           color: value.first.color,
-          timeEstimated: value.map((detail) => detail.destinationTime).toList(),
+          timeEstimated: value
+              .map((detail) => '$dateTime ${detail.timeEstimated}')
+              .toList(),
         );
         destinationDetailList.add(destinationDetail);
       });

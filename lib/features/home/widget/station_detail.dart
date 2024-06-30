@@ -48,6 +48,8 @@ class StationSchedule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final timeEstimated = destinationDetail.timeEstimated;
+
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
@@ -99,15 +101,18 @@ class StationSchedule extends StatelessWidget {
                             color: Colors.grey.shade700,
                           ),
                         ),
-                        const Text(
-                          '17.31',
-                          style: TextStyle(
+                        Text(
+                          DateTimeUtils.parseToDateFormat(
+                            date: timeEstimated[0],
+                            dateFormat: 'HH:mm',
+                          ),
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          'dalam 9 menit',
+                          _getReadableTimeDiff(timeEstimated[0]),
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey.shade700,
@@ -130,13 +135,17 @@ class StationSchedule extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      NextSchedule(),
-                      NextSchedule(),
-                      NextSchedule(),
-                      NextSchedule(),
+                      if (timeEstimated.elementAtOrNull(1) != null)
+                        NextSchedule(timeEstimated[1]),
+                      if (timeEstimated.elementAtOrNull(2) != null)
+                        NextSchedule(timeEstimated[2]),
+                      if (timeEstimated.elementAtOrNull(3) != null)
+                        NextSchedule(timeEstimated[3]),
+                      if (timeEstimated.elementAtOrNull(4) != null)
+                        NextSchedule(timeEstimated[4]),
                     ],
                   ),
                   const Divider(),
@@ -151,24 +160,30 @@ class StationSchedule extends StatelessWidget {
 }
 
 class NextSchedule extends StatelessWidget {
-  const NextSchedule({
+  const NextSchedule(
+    this.timeEstimated, {
     super.key,
   });
+
+  final String timeEstimated;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '18.43',
-          style: TextStyle(
+        Text(
+          DateTimeUtils.parseToDateFormat(
+            date: timeEstimated,
+            dateFormat: 'HH:mm',
+          ),
+          style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
-          'Dalam 27 menit',
+          _getReadableTimeDiff(timeEstimated),
           style: TextStyle(
             fontSize: 10,
             color: Colors.grey.shade600,
@@ -176,5 +191,19 @@ class NextSchedule extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+String _getReadableTimeDiff(String timeDiff) {
+  final diff = DateTimeUtils.getTimeDiffFromNow(
+    dateTime: timeDiff,
+  );
+
+  if (diff.inHours >= 1) {
+    return 'dalam ${diff.inHours} jam';
+  } else if (diff.inMinutes > 0) {
+    return 'dalam ${diff.inMinutes} menit';
+  } else {
+    return 'dalam 1 menit';
   }
 }
