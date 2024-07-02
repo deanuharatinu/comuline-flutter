@@ -1,4 +1,6 @@
 import 'package:comuline/component_library/extensions/value_utils.dart';
+import 'package:comuline/component_library/theme/dark_mode_preference.dart';
+import 'package:comuline/data/local/model/app_state_local.dart';
 import 'package:comuline/data/local/model/station_local.dart';
 import 'package:comuline/models/station.dart';
 import 'package:isar/isar.dart';
@@ -51,5 +53,28 @@ class LocalSource {
     });
 
     return true;
+  }
+
+  Future<void> upsertDarkModePreference(
+      DarkModePreference darkModePreference) async {
+    var appState = await _dbService.appStateLocals.where().findFirst();
+    if (appState != null) {
+      appState.darkModePreference = darkModePreference;
+    } else {
+      appState = AppStateLocal()..darkModePreference = darkModePreference;
+    }
+
+    await _dbService.writeTxn(() async {
+      return await _dbService.appStateLocals.put(appState!);
+    });
+  }
+
+  Future<DarkModePreference> getDarkModePreference() async {
+    final appStateLocal = await _dbService.appStateLocals.where().findFirst();
+    if (appStateLocal == null) {
+      return DarkModePreference.alwaysLight;
+    }
+
+    return appStateLocal.darkModePreference;
   }
 }

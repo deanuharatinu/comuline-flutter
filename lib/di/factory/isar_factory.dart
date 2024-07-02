@@ -1,3 +1,4 @@
+import 'package:comuline/data/local/model/app_state_local.dart';
 import 'package:comuline/data/local/model/station_local.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
@@ -19,7 +20,7 @@ class IsarFactory {
   Future<Isar> _initIsar() async {
     final dir = await getApplicationDocumentsDirectory();
     return await Isar.open(
-      [StationLocalSchema],
+      [StationLocalSchema, AppStateLocalSchema],
       directory: dir.path,
     );
   }
