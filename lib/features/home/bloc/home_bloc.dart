@@ -21,7 +21,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         if (event is HomeStarted) {
           await _getStations(emitter);
         } else if (event is HomeRefresh) {
-          await _getStations(emitter);
+          // TODO
         } else if (event is HomeStationDetailPressed) {
           await _getStationDetailById(event.stationId, emitter);
         }
@@ -104,7 +104,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
       emitter(homeState);
     } else {
-      Future.value();
+      final homeState = HomeState(
+          status: HomeStatus.success,
+          stations: state.stations.map((station) {
+            if (station.id == stationId) {
+              return station.copyWithdestinationDetail([]);
+            }
+
+            return station;
+          }).toList());
+
+      emitter(homeState);
     }
   }
 }

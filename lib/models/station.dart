@@ -9,7 +9,7 @@ class Station extends Equatable {
     required this.fgEnable,
     required this.haveSchedule,
     required this.updatedAt,
-    this.destinationDetail = const [],
+    this.destinationDetail,
   });
 
   final String id;
@@ -18,7 +18,7 @@ class Station extends Equatable {
   final int fgEnable;
   final bool haveSchedule;
   final String updatedAt;
-  final List<DestinationDetail> destinationDetail;
+  final List<DestinationDetail>? destinationDetail;
 
   Station copyWithdestinationDetail(
     List<DestinationDetail> destinationDetail,

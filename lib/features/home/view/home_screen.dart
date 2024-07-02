@@ -1,5 +1,6 @@
 import 'package:comuline/component_library/extensions/value_utils.dart';
 import 'package:comuline/component_library/theme/comuline_theme.dart';
+import 'package:comuline/component_library/theme/comuline_theme_data.dart';
 import 'package:comuline/component_library/theme/dark_mode_preference.dart';
 import 'package:comuline/component_library/theme/styled_status_bar.dart';
 import 'package:comuline/data/repository/station_repository.dart';
@@ -8,6 +9,7 @@ import 'package:comuline/features/home/view/shimmer.dart';
 import 'package:comuline/features/home/widget/station_detail.dart';
 import 'package:comuline/features/home/widget/custom_app_bar.dart';
 import 'package:comuline/features/home/widget/custom_search_bar.dart';
+import 'package:comuline/models/destination_detail.dart';
 import 'package:comuline/models/exceptions.dart';
 import 'package:comuline/models/station.dart';
 import 'package:flutter/cupertino.dart';
@@ -189,6 +191,8 @@ class ShowStationList extends StatelessWidget {
           childCount: _stationList.length,
           (context, index) {
             final station = _stationList[index];
+            final destinationDetail = station.destinationDetail;
+
             return ExpansionTile(
               expandedCrossAxisAlignment: CrossAxisAlignment.start,
               key: PageStorageKey(station.id),
@@ -221,34 +225,48 @@ class ShowStationList extends StatelessWidget {
                 }
               },
               children: [
-                if (station.destinationDetail.isEmpty)
-                  Shimmer(
-                    linearGradient: theme.shimmerGradient,
-                    child: ShimmerLoading(
-                      isLoading: true,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Container(
-                          height: 60,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(6),
-                            color: Colors.white,
-                          ),
-                          width: double.infinity,
-                        ),
-                      ),
-                    ),
-                  ),
-                if (station.destinationDetail.isNotEmpty)
-                  StationDetail(
-                    destinationDetail: station.destinationDetail,
-                  ),
+                showStationDetail(theme, destinationDetail),
               ],
             );
           },
         ),
       ),
     );
+  }
+
+  Widget showStationDetail(
+    ComulineThemeData theme,
+    List<DestinationDetail>? destinationDetail,
+  ) {
+    if (destinationDetail == null) {
+      return Shimmer(
+        linearGradient: theme.shimmerGradient,
+        child: ShimmerLoading(
+          isLoading: true,
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Container(
+              height: 60,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                color: Colors.white,
+              ),
+              width: double.infinity,
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (destinationDetail.isEmpty) {
+      return const Text(
+        'Jadwal kereta api tidak tersedia. Cek lagi pada esok hari.',
+      );
+    } else {
+      return StationDetail(
+        destinationDetail: destinationDetail,
+      );
+    }
   }
 }
 
