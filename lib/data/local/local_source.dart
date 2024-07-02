@@ -11,8 +11,17 @@ class LocalSource {
   final Isar _dbService;
 
   Future<List<Station>> getStations() async {
-    final stationsLocalList =
-        await _dbService.stationLocals.where().sortById().findAll();
+    var stationsLocalList = await _dbService.stationLocals
+        .where()
+        .isBookmarkedEqualTo(true)
+        .sortById()
+        .findAll();
+
+    if (stationsLocalList.isEmpty) {
+      final defaultStation =
+          await _dbService.stationLocals.where().sortById().findFirst();
+      stationsLocalList = [if (defaultStation != null) defaultStation];
+    }
 
     return stationsLocalList.map((stationLocal) {
       return Station(
