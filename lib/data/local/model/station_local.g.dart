@@ -37,13 +37,18 @@ const StationLocalSchema = CollectionSchema(
       name: r'id',
       type: IsarType.string,
     ),
-    r'name': PropertySchema(
+    r'isBookmarked': PropertySchema(
       id: 4,
+      name: r'isBookmarked',
+      type: IsarType.bool,
+    ),
+    r'name': PropertySchema(
+      id: 5,
       name: r'name',
       type: IsarType.string,
     ),
     r'updatedAt': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'updatedAt',
       type: IsarType.string,
     )
@@ -53,7 +58,21 @@ const StationLocalSchema = CollectionSchema(
   deserialize: _stationLocalDeserialize,
   deserializeProp: _stationLocalDeserializeProp,
   idName: r'isarId',
-  indexes: {},
+  indexes: {
+    r'isBookmarked': IndexSchema(
+      id: -5205273177397984230,
+      name: r'isBookmarked',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'isBookmarked',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    )
+  },
   links: {},
   embeddedSchemas: {},
   getId: _stationLocalGetId,
@@ -99,8 +118,9 @@ void _stationLocalSerialize(
   writer.writeLong(offsets[1], object.fgEnable);
   writer.writeBool(offsets[2], object.haveSchedule);
   writer.writeString(offsets[3], object.id);
-  writer.writeString(offsets[4], object.name);
-  writer.writeString(offsets[5], object.updatedAt);
+  writer.writeBool(offsets[4], object.isBookmarked);
+  writer.writeString(offsets[5], object.name);
+  writer.writeString(offsets[6], object.updatedAt);
 }
 
 StationLocal _stationLocalDeserialize(
@@ -114,8 +134,9 @@ StationLocal _stationLocalDeserialize(
   object.fgEnable = reader.readLongOrNull(offsets[1]);
   object.haveSchedule = reader.readBoolOrNull(offsets[2]);
   object.id = reader.readStringOrNull(offsets[3]);
-  object.name = reader.readStringOrNull(offsets[4]);
-  object.updatedAt = reader.readStringOrNull(offsets[5]);
+  object.isBookmarked = reader.readBoolOrNull(offsets[4]);
+  object.name = reader.readStringOrNull(offsets[5]);
+  object.updatedAt = reader.readStringOrNull(offsets[6]);
   return object;
 }
 
@@ -135,8 +156,10 @@ P _stationLocalDeserializeProp<P>(
     case 3:
       return (reader.readStringOrNull(offset)) as P;
     case 4:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readBoolOrNull(offset)) as P;
     case 5:
+      return (reader.readStringOrNull(offset)) as P;
+    case 6:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -159,6 +182,14 @@ extension StationLocalQueryWhereSort
   QueryBuilder<StationLocal, StationLocal, QAfterWhere> anyIsarId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
+    });
+  }
+
+  QueryBuilder<StationLocal, StationLocal, QAfterWhere> anyIsBookmarked() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'isBookmarked'),
+      );
     });
   }
 }
@@ -231,6 +262,73 @@ extension StationLocalQueryWhere
         upper: upperIsarId,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<StationLocal, StationLocal, QAfterWhereClause>
+      isBookmarkedIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'isBookmarked',
+        value: [null],
+      ));
+    });
+  }
+
+  QueryBuilder<StationLocal, StationLocal, QAfterWhereClause>
+      isBookmarkedIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'isBookmarked',
+        lower: [null],
+        includeLower: false,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<StationLocal, StationLocal, QAfterWhereClause>
+      isBookmarkedEqualTo(bool? isBookmarked) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'isBookmarked',
+        value: [isBookmarked],
+      ));
+    });
+  }
+
+  QueryBuilder<StationLocal, StationLocal, QAfterWhereClause>
+      isBookmarkedNotEqualTo(bool? isBookmarked) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isBookmarked',
+              lower: [],
+              upper: [isBookmarked],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isBookmarked',
+              lower: [isBookmarked],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isBookmarked',
+              lower: [isBookmarked],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isBookmarked',
+              lower: [],
+              upper: [isBookmarked],
+              includeUpper: false,
+            ));
+      }
     });
   }
 }
@@ -554,6 +652,34 @@ extension StationLocalQueryFilter
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'id',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<StationLocal, StationLocal, QAfterFilterCondition>
+      isBookmarkedIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'isBookmarked',
+      ));
+    });
+  }
+
+  QueryBuilder<StationLocal, StationLocal, QAfterFilterCondition>
+      isBookmarkedIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'isBookmarked',
+      ));
+    });
+  }
+
+  QueryBuilder<StationLocal, StationLocal, QAfterFilterCondition>
+      isBookmarkedEqualTo(bool? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isBookmarked',
+        value: value,
       ));
     });
   }
@@ -976,6 +1102,19 @@ extension StationLocalQuerySortBy
     });
   }
 
+  QueryBuilder<StationLocal, StationLocal, QAfterSortBy> sortByIsBookmarked() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isBookmarked', Sort.asc);
+    });
+  }
+
+  QueryBuilder<StationLocal, StationLocal, QAfterSortBy>
+      sortByIsBookmarkedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isBookmarked', Sort.desc);
+    });
+  }
+
   QueryBuilder<StationLocal, StationLocal, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -1052,6 +1191,19 @@ extension StationLocalQuerySortThenBy
     });
   }
 
+  QueryBuilder<StationLocal, StationLocal, QAfterSortBy> thenByIsBookmarked() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isBookmarked', Sort.asc);
+    });
+  }
+
+  QueryBuilder<StationLocal, StationLocal, QAfterSortBy>
+      thenByIsBookmarkedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isBookmarked', Sort.desc);
+    });
+  }
+
   QueryBuilder<StationLocal, StationLocal, QAfterSortBy> thenByIsarId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isarId', Sort.asc);
@@ -1116,6 +1268,12 @@ extension StationLocalQueryWhereDistinct
     });
   }
 
+  QueryBuilder<StationLocal, StationLocal, QDistinct> distinctByIsBookmarked() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isBookmarked');
+    });
+  }
+
   QueryBuilder<StationLocal, StationLocal, QDistinct> distinctByName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1160,6 +1318,12 @@ extension StationLocalQueryProperty
   QueryBuilder<StationLocal, String?, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<StationLocal, bool?, QQueryOperations> isBookmarkedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isBookmarked');
     });
   }
 

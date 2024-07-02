@@ -12,4 +12,6 @@ class StationLocal {
   int? fgEnable;
   bool? haveSchedule;
   String? updatedAt;
+  @Index()
+  bool? isBookmarked;
 }
