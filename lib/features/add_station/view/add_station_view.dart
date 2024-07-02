@@ -85,12 +85,20 @@ class _AddStationViewState extends State<AddStationView> {
                         vertical: 8.0,
                         horizontal: 16.0,
                       ),
-                      child: Text(
-                        'Belum Tersimpan',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade700,
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Divider(),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Belum Tersimpan',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
