@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:comuline/data/repository/station_repository.dart';
 import 'package:comuline/features/add_station/bloc/add_station_bloc.dart';
 import 'package:comuline/features/add_station/view/add_station_view.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,9 @@ class AddStationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AddStationBloc(),
+      create: (context) => AddStationBloc(
+        stationRepository: context.read<StationRepository>(),
+      ),
       child: const AddStationView(),
     );
   }

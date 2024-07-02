@@ -13,17 +13,8 @@ class LocalSource {
   final Isar _dbService;
 
   Future<List<Station>> getStations() async {
-    var stationsLocalList = await _dbService.stationLocals
-        .where()
-        .isBookmarkedEqualTo(true)
-        .sortById()
-        .findAll();
-
-    if (stationsLocalList.isEmpty) {
-      final defaultStation =
-          await _dbService.stationLocals.where().sortById().findFirst();
-      stationsLocalList = [if (defaultStation != null) defaultStation];
-    }
+    var stationsLocalList =
+        await _dbService.stationLocals.where().sortById().findAll();
 
     return stationsLocalList.map((stationLocal) {
       return Station(
@@ -33,6 +24,7 @@ class LocalSource {
         fgEnable: stationLocal.fgEnable.orInt(0),
         haveSchedule: stationLocal.haveSchedule.orBool(false),
         updatedAt: stationLocal.updatedAt.orEmpty,
+        isBookmarked: stationLocal.isBookmarked.orBool(false),
       );
     }).toList();
   }
@@ -45,7 +37,8 @@ class LocalSource {
         ..fgEnable = station.fgEnable
         ..haveSchedule = station.haveSchedule
         ..name = station.name
-        ..updatedAt = station.updatedAt;
+        ..updatedAt = station.updatedAt
+        ..isBookmarked = station.isBookmarked;
     }).toList();
 
     await _dbService.writeTxn(() async {

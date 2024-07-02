@@ -26,7 +26,31 @@ class StationRepository {
 
     // If remote fetch success, save to local
     if (remoteData is Success<List<Station>>) {
-      final value = remoteData.value;
+      final bookmarkedSet = <String>{};
+      for (var station in localData) {
+        final isBookmarked = station.isBookmarked ?? false;
+        if (isBookmarked) bookmarkedSet.add(station.id);
+      }
+
+      if (bookmarkedSet.isEmpty) {
+        bookmarkedSet.add(localData.first.id);
+      }
+
+      final value = remoteData.value.map((station) {
+        if (bookmarkedSet.contains(station.id)) {
+          return Station(
+            id: station.id,
+            name: station.name,
+            daop: station.daop,
+            fgEnable: station.fgEnable,
+            haveSchedule: station.haveSchedule,
+            updatedAt: station.updatedAt,
+            isBookmarked: true,
+          );
+        }
+
+        return station;
+      }).toList();
       await _localSource.upsertStations(value);
     }
 
@@ -40,6 +64,11 @@ class StationRepository {
     } else {
       yield Success(localData);
     }
+  }
+
+  Future<Result<List<Station>>> getStationsFromLocal() async {
+    final localData = await _localSource.getStations();
+    return Success(localData);
   }
 
   Future<Result<List<DestinationDetail>>> getStationDetailById(

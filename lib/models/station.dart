@@ -10,6 +10,7 @@ class Station extends Equatable {
     required this.haveSchedule,
     required this.updatedAt,
     this.destinationDetail,
+    this.isBookmarked,
   });
 
   final String id;
@@ -19,6 +20,7 @@ class Station extends Equatable {
   final bool haveSchedule;
   final String updatedAt;
   final List<DestinationDetail>? destinationDetail;
+  final bool? isBookmarked;
 
   Station copyWithdestinationDetail(
     List<DestinationDetail> destinationDetail,
@@ -31,6 +33,7 @@ class Station extends Equatable {
       haveSchedule: haveSchedule,
       updatedAt: updatedAt,
       destinationDetail: destinationDetail,
+      isBookmarked: isBookmarked,
     );
   }
 
@@ -43,5 +46,6 @@ class Station extends Equatable {
         haveSchedule,
         updatedAt,
         destinationDetail,
+        isBookmarked,
       ];
 }

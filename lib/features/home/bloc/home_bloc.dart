@@ -21,7 +21,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         if (event is HomeStarted) {
           await _getStations(emitter);
         } else if (event is HomeRefresh) {
-          // TODO
+          await _getStations(emitter);
         } else if (event is HomeStationDetailPressed) {
           await _getStationDetailById(event.stationId, emitter);
         }
@@ -57,7 +57,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     var streamOfHomeState = result.map((convert) {
       if (convert is Success<List<Station>>) {
-        final value = convert.value;
+        final value = convert.value.where((station) {
+          final isBookmarked = station.isBookmarked ?? false;
+          return isBookmarked;
+        }).toList();
         return HomeState(
           status: HomeStatus.success,
           stations: value,
