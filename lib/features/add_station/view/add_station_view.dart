@@ -28,36 +28,30 @@ class _AddStationViewState extends State<AddStationView> {
   Widget build(BuildContext context) {
     final theme = ComulineTheme.of(context);
 
-    return StreamBuilder<DarkModePreference>(
-        stream: context.read<AppStateRepository>().getDarkModePreference(),
-        builder: (context, snapshot) {
-          final darkModePreference = snapshot.data;
-
-          return StyledStatusBar.dynamic(
-            statusBarStyle: darkModePreference.getStatusBarStyle(),
-            child: Scaffold(
-              body: SafeArea(
-                child: CustomScrollView(
-                  slivers: [
-                    SliverAppBar(
-                      pinned: true,
-                      floating: true,
-                      surfaceTintColor: Colors.grey.shade500,
-                      flexibleSpace: const FlexibleSpaceBar(
-                        titlePadding: EdgeInsets.only(
-                          top: 8,
-                          bottom: 8,
-                          right: 16,
-                          left: 58,
-                        ),
-                        title: CustomSearchBar(),
-                      ),
-                    ),
-                  ],
+    return StyledStatusBar.dynamic(
+      statusBarStyle: theme.darkModePreference.getStatusBarStyle(),
+      child: Scaffold(
+        body: SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                floating: true,
+                surfaceTintColor: Colors.grey.shade500,
+                flexibleSpace: const FlexibleSpaceBar(
+                  titlePadding: EdgeInsets.only(
+                    top: 8,
+                    bottom: 8,
+                    right: 16,
+                    left: 58,
+                  ),
+                  title: CustomSearchBar(),
                 ),
               ),
-            ),
-          );
-        });
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

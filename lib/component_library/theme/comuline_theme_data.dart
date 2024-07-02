@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 abstract class ComulineThemeData {
   ThemeData get materialThemeData;
   LinearGradient get shimmerGradient;
+  DarkModePreference get darkModePreference;
 }
 
 class LightComulineThemeData extends ComulineThemeData {
@@ -43,6 +44,9 @@ class LightComulineThemeData extends ComulineThemeData {
         end: const Alignment(1.0, 0.3),
         tileMode: TileMode.clamp,
       );
+
+  @override
+  DarkModePreference get darkModePreference => DarkModePreference.alwaysLight;
 }
 
 class DarkComulineThemeData extends ComulineThemeData {
@@ -81,6 +85,9 @@ class DarkComulineThemeData extends ComulineThemeData {
         end: const Alignment(1.0, 0.3),
         tileMode: TileMode.clamp,
       );
+
+  @override
+  DarkModePreference get darkModePreference => DarkModePreference.alwaysDark;
 }
 
 extension ThemeExtension on DarkModePreference? {
