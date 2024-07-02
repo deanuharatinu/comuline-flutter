@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:comuline/component_library/extensions/value_utils.dart';
 import 'package:comuline/component_library/theme/comuline_theme.dart';
 import 'package:comuline/component_library/theme/comuline_theme_data.dart';
@@ -12,9 +13,9 @@ import 'package:comuline/features/home/widget/station_detail.dart';
 import 'package:comuline/models/destination_detail.dart';
 import 'package:comuline/models/exceptions.dart';
 import 'package:comuline/models/station.dart';
+import 'package:comuline/router/router.gr.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -44,24 +45,6 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
-  SystemUiOverlayStyle _getStatusBarStyle(
-    DarkModePreference? darkModePreference,
-  ) {
-    if (darkModePreference == DarkModePreference.alwaysLight) {
-      return SystemUiOverlayStyle.dark;
-    } else {
-      return SystemUiOverlayStyle.light;
-    }
-  }
-
-  DarkModePreference _toggleDarkMode(DarkModePreference? currentState) {
-    if (currentState == DarkModePreference.alwaysLight) {
-      return DarkModePreference.alwaysDark;
-    } else {
-      return DarkModePreference.alwaysLight;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final appStateRepository =
@@ -73,7 +56,7 @@ class _HomeViewState extends State<HomeView> {
           final darkModePreference = snapshot.data;
 
           return StyledStatusBar.dynamic(
-            statusBarStyle: _getStatusBarStyle(darkModePreference),
+            statusBarStyle: darkModePreference.getStatusBarStyle(),
             child: Scaffold(
               body: SafeArea(
                 child: CustomScrollView(
@@ -83,7 +66,7 @@ class _HomeViewState extends State<HomeView> {
                   slivers: [
                     CustomAppBar(onThemeToggleTap: () {
                       appStateRepository.upsertDarkModePreference(
-                        _toggleDarkMode(darkModePreference),
+                        darkModePreference.toggleDarkMode(),
                       );
                     }),
                     SliverAppBar(
@@ -106,7 +89,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
               floatingActionButton: FloatingActionButton(
-                onPressed: () => _bloc.add(const HomeRefresh()),
+                onPressed: () => context.pushRoute(const AddStationRoute()),
                 foregroundColor: Colors.grey.shade600,
                 backgroundColor: Colors.grey.shade600,
                 child: const Icon(

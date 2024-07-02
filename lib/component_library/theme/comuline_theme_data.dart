@@ -1,4 +1,6 @@
+import 'package:comuline/component_library/theme/dark_mode_preference.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 abstract class ComulineThemeData {
   ThemeData get materialThemeData;
@@ -79,4 +81,22 @@ class DarkComulineThemeData extends ComulineThemeData {
         end: const Alignment(1.0, 0.3),
         tileMode: TileMode.clamp,
       );
+}
+
+extension ThemeExtension on DarkModePreference? {
+  SystemUiOverlayStyle getStatusBarStyle() {
+    if (this == DarkModePreference.alwaysLight) {
+      return SystemUiOverlayStyle.dark;
+    } else {
+      return SystemUiOverlayStyle.light;
+    }
+  }
+
+  DarkModePreference toggleDarkMode() {
+    if (this == DarkModePreference.alwaysLight) {
+      return DarkModePreference.alwaysDark;
+    } else {
+      return DarkModePreference.alwaysLight;
+    }
+  }
 }
