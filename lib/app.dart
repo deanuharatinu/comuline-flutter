@@ -2,17 +2,13 @@ import 'package:comuline/component_library/theme/comuline_theme.dart';
 import 'package:comuline/component_library/theme/comuline_theme_data.dart';
 import 'package:comuline/component_library/theme/dark_mode_preference.dart';
 import 'package:comuline/data/repository/app_state_repository.dart';
+import 'package:comuline/di/service_locator.dart';
 import 'package:comuline/router/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Comuline extends StatefulWidget {
-  const Comuline({
-    required AppRouter appRouter,
-    super.key,
-  }) : _appRouter = appRouter;
-
-  final AppRouter _appRouter;
+  const Comuline({super.key});
 
   @override
   State<Comuline> createState() => _ComulineState();
@@ -21,6 +17,13 @@ class Comuline extends StatefulWidget {
 class _ComulineState extends State<Comuline> {
   final lightTheme = LightComulineThemeData();
   final darkTheme = DarkComulineThemeData();
+  late AppRouter appRouter;
+
+  @override
+  void initState() {
+    appRouter = ServiceLocator.getAppRouter();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +44,7 @@ class _ComulineState extends State<Comuline> {
               themeMode: darkModePreference?.themeMode(),
               theme: lightTheme.materialThemeData,
               darkTheme: darkTheme.materialThemeData,
-              routerConfig: widget._appRouter.config(),
+              routerConfig: appRouter.config(),
             ),
           );
         });
