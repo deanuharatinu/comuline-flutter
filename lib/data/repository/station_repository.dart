@@ -109,4 +109,12 @@ class StationRepository {
       );
     }
   }
+
+  Future<void> addBookmarkById(String stationId) async {
+    await _localSource.addBookmarkById(stationId);
+  }
+
+  Future<void> removeBookmarkById(String stationId) async {
+    await _localSource.removeBookmarkById(stationId);
+  }
 }

@@ -26,13 +26,18 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends State<HomeView> with AutoRouteAwareStateMixin {
   HomeBloc get _bloc => context.read<HomeBloc>();
 
   @override
   void initState() {
     _bloc.add(const HomeStarted());
     super.initState();
+  }
+
+  @override
+  void didPopNext() {
+    _refreshData();
   }
 
   Future<void> _refreshData() async {

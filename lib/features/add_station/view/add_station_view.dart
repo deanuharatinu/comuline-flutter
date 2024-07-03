@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:comuline/component_library/extensions/value_utils.dart';
 import 'package:comuline/component_library/theme/comuline_theme.dart';
 import 'package:comuline/component_library/theme/comuline_theme_data.dart';
@@ -41,6 +42,7 @@ class _AddStationViewState extends State<AddStationView> {
                   SliverAppBar(
                     pinned: false,
                     floating: true,
+                    leading: const AutoLeadingButton(),
                     surfaceTintColor: Colors.grey.shade500,
                     flexibleSpace: const FlexibleSpaceBar(
                       titlePadding: EdgeInsets.only(
@@ -123,16 +125,20 @@ class _BookmarkedStationList extends StatelessWidget {
             final station = bookmarkedStationList[index];
 
             return ListTile(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    station.name.capitalize,
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
+              title: Text(
+                station.name.capitalize,
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+              trailing: IconButton(
+                onPressed: () {
+                  final event = AddStationRemoveBookmarkPressed(
+                    stationId: station.id,
+                  );
+                  context.read<AddStationBloc>().add(event);
+                },
+                icon: Icon(Icons.close, color: Colors.grey.shade700),
               ),
             );
           },
@@ -165,16 +171,17 @@ class _NotBookmarkedStationList extends StatelessWidget {
             final station = notBookmarkedStationList[index];
 
             return ListTile(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    station.name.capitalize,
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
+              onTap: () {
+                final event = AddStationBookmarkPressed(
+                  stationId: station.id,
+                );
+                context.read<AddStationBloc>().add(event);
+              },
+              title: Text(
+                station.name.capitalize,
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
               ),
             );
           },

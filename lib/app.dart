@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:comuline/component_library/theme/comuline_theme.dart';
 import 'package:comuline/component_library/theme/comuline_theme_data.dart';
 import 'package:comuline/component_library/theme/dark_mode_preference.dart';
@@ -44,7 +45,11 @@ class _ComulineState extends State<Comuline> {
               themeMode: darkModePreference?.themeMode(),
               theme: lightTheme.materialThemeData,
               darkTheme: darkTheme.materialThemeData,
-              routerConfig: appRouter.config(),
+              routerConfig: appRouter.config(
+                navigatorObservers: () => [
+                  AutoRouteObserver(),
+                ],
+              ),
             ),
           );
         });

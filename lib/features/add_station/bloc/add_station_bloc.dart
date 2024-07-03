@@ -12,11 +12,15 @@ class AddStationBloc extends Bloc<AddStationEvent, AddStationState> {
     required StationRepository stationRepository,
   })  : _stationRepository = stationRepository,
         super(AddStationInitial()) {
-    on<AddStationEvent>((event, emit) async {
+    on<AddStationEvent>((event, emitter) async {
       if (event is AddStationStarted) {
-        await _getStations(emit);
-      } else {
-        // TODO
+        await _getStations(emitter);
+      } else if (event is AddStationBookmarkPressed) {
+        await _addBookmark(event.stationId);
+        await _getStations(emitter);
+      } else if (event is AddStationRemoveBookmarkPressed) {
+        await _removeBookmark(event.stationId);
+        await _getStations(emitter);
       }
     });
   }
@@ -44,5 +48,13 @@ class AddStationBloc extends Bloc<AddStationEvent, AddStationState> {
     );
 
     emitter(state);
+  }
+
+  Future<void> _addBookmark(String stationId) async {
+    await _stationRepository.addBookmarkById(stationId);
+  }
+
+  Future<void> _removeBookmark(String stationId) async {
+    await _stationRepository.removeBookmarkById(stationId);
   }
 }

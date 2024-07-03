@@ -17,4 +17,10 @@ final class AddStationLoadSuccess extends AddStationState {
 
   final List<Station> bookmarkedStationList;
   final List<Station> notBookmarkedStationList;
+
+  @override
+  List<Object> get props => [
+        bookmarkedStationList.length,
+        notBookmarkedStationList.length,
+      ];
 }

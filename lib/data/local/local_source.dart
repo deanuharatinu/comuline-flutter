@@ -70,4 +70,34 @@ class LocalSource {
 
     return appStateLocal.darkModePreference;
   }
+
+  Future<bool> addBookmarkById(String stationId) async {
+    final stationLocal = await _dbService.stationLocals
+        .where()
+        .isarIdEqualTo(stationId.fastHash)
+        .findFirst();
+    if (stationLocal == null) return false;
+
+    stationLocal.isBookmarked = true;
+    await _dbService.writeTxn(() async {
+      return await _dbService.stationLocals.put(stationLocal);
+    });
+
+    return true;
+  }
+
+  Future<bool> removeBookmarkById(String stationId) async {
+    final stationLocal = await _dbService.stationLocals
+        .where()
+        .isarIdEqualTo(stationId.fastHash)
+        .findFirst();
+    if (stationLocal == null) return false;
+
+    stationLocal.isBookmarked = false;
+    await _dbService.writeTxn(() async {
+      return await _dbService.stationLocals.put(stationLocal);
+    });
+
+    return true;
+  }
 }
