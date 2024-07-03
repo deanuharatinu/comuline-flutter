@@ -4,7 +4,6 @@ import 'package:comuline/component_library/theme/comuline_theme_data.dart';
 import 'package:comuline/component_library/theme/styled_status_bar.dart';
 import 'package:comuline/features/add_station/bloc/add_station_bloc.dart';
 import 'package:comuline/features/home/widget/custom_search_bar.dart';
-import 'package:comuline/models/station.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -30,14 +29,6 @@ class _AddStationViewState extends State<AddStationView> {
 
     return BlocBuilder<AddStationBloc, AddStationState>(
       builder: (context, state) {
-        // TODO harus diextract terpisah untuk bisa pisahin dari state yang lain
-        var bookmarkedStationList = <Station>[];
-        var notBookmarkedStationList = <Station>[];
-        if (state is AddStationLoadSuccess) {
-          bookmarkedStationList = state.bookmarkedStationList;
-          notBookmarkedStationList = state.notBookmarkedStationList;
-        }
-
         return StyledStatusBar.dynamic(
           statusBarStyle: theme.darkModePreference.getStatusBarStyle(),
           child: Scaffold(
@@ -76,9 +67,7 @@ class _AddStationViewState extends State<AddStationView> {
                       ),
                     ),
                   ),
-                  _BookmarkedStationList(
-                    bookmarkedStationList: bookmarkedStationList,
-                  ),
+                  _BookmarkedStationList(state: state),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -102,9 +91,7 @@ class _AddStationViewState extends State<AddStationView> {
                       ),
                     ),
                   ),
-                  _NotBookmarkedStationList(
-                    notBookmarkedStationList: notBookmarkedStationList,
-                  ),
+                  _NotBookmarkedStationList(state: state),
                 ],
               ),
             ),
@@ -117,68 +104,84 @@ class _AddStationViewState extends State<AddStationView> {
 
 class _BookmarkedStationList extends StatelessWidget {
   const _BookmarkedStationList({
-    required this.bookmarkedStationList,
+    required this.state,
   });
 
-  final List<Station> bookmarkedStationList;
+  final AddStationState state;
 
   @override
   Widget build(BuildContext context) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        childCount: bookmarkedStationList.length,
-        (context, index) {
-          final station = bookmarkedStationList[index];
+    if (state is AddStationInitial) {
+      return const SliverToBoxAdapter();
+    } else if (state is AddStationLoadSuccess) {
+      final bookmarkedStationList =
+          (state as AddStationLoadSuccess).bookmarkedStationList;
+      return SliverList(
+        delegate: SliverChildBuilderDelegate(
+          childCount: bookmarkedStationList.length,
+          (context, index) {
+            final station = bookmarkedStationList[index];
 
-          return ListTile(
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  station.name.capitalize,
-                  style: const TextStyle(
-                    fontSize: 16,
+            return ListTile(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    station.name.capitalize,
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+                ],
+              ),
+            );
+          },
+        ),
+      );
+    } else {
+      return const SliverToBoxAdapter();
+    }
   }
 }
 
 class _NotBookmarkedStationList extends StatelessWidget {
   const _NotBookmarkedStationList({
-    required this.notBookmarkedStationList,
+    required this.state,
   });
 
-  final List<Station> notBookmarkedStationList;
+  final AddStationState state;
 
   @override
   Widget build(BuildContext context) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        childCount: notBookmarkedStationList.length,
-        (context, index) {
-          final station = notBookmarkedStationList[index];
+    if (state is AddStationInitial) {
+      return const SliverToBoxAdapter();
+    } else if (state is AddStationLoadSuccess) {
+      final notBookmarkedStationList =
+          (state as AddStationLoadSuccess).notBookmarkedStationList;
+      return SliverList(
+        delegate: SliverChildBuilderDelegate(
+          childCount: notBookmarkedStationList.length,
+          (context, index) {
+            final station = notBookmarkedStationList[index];
 
-          return ListTile(
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  station.name.capitalize,
-                  style: const TextStyle(
-                    fontSize: 16,
+            return ListTile(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    station.name.capitalize,
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+                ],
+              ),
+            );
+          },
+        ),
+      );
+    } else {
+      return const SliverToBoxAdapter();
+    }
   }
 }
