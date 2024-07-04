@@ -5,6 +5,7 @@ import 'package:comuline/data/repository/station_repository.dart';
 import 'package:comuline/models/exceptions.dart';
 import 'package:comuline/models/station.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -24,20 +25,30 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           await _getStations(emitter);
         } else if (event is HomeStationDetailPressed) {
           await _getStationDetailById(event.stationId, emitter);
+        } else if (event is HomeSearchTermChanged) {
+          await _searchStationByName(event.searchTerm, emitter);
         }
       },
       transformer: (events, mapper) {
         final nonDebounceEventStream = events.where(
-          (event) => event is! HomeStationDetailPressed,
+          (event) {
+            return event is! HomeSearchTermChanged &&
+                event is! HomeStationDetailPressed;
+          },
         );
 
         final debounceEventStream = events
             .whereType<HomeStationDetailPressed>()
             .debounceTime(const Duration(seconds: 1));
 
+        final debounceSearchEvent = events
+            .whereType<HomeSearchTermChanged>()
+            .debounceTime(const Duration(milliseconds: 500));
+
         final mergedEventStream = MergeStream([
           nonDebounceEventStream,
           debounceEventStream,
+          debounceSearchEvent,
         ]);
 
         final restartableTransformer = restartable<HomeEvent>();
@@ -64,12 +75,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         return HomeState(
           status: HomeStatus.success,
           stations: value,
+          searchResult: value,
         );
       } else if (convert is Error<List<Station>>) {
         return HomeState(
           status: HomeStatus.error,
           error: convert.exception,
           stations: state.stations,
+          searchResult: state.stations,
         );
       }
 
@@ -119,5 +132,28 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
       emitter(homeState);
     }
+  }
+
+  Future<void> _searchStationByName(
+    String searchTerm,
+    Emitter<HomeState> emitter,
+  ) async {
+    final searchResult = state.stations.where((station) {
+      return station.name.toLowerCase().contains(searchTerm.toLowerCase());
+    }).toList();
+
+    if (searchTerm.isEmpty) {
+      emitter(
+        state.copyWithInitialStations(initialStations: state.stations),
+      );
+      return;
+    }
+
+    emitter(
+      state.copyWithSearchResult(
+        initialStations: state.stations,
+        searchResult: searchResult,
+      ),
+    );
   }
 }

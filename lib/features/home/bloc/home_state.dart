@@ -6,11 +6,13 @@ final class HomeState extends Equatable {
   const HomeState({
     this.status = HomeStatus.loading,
     this.stations = const <Station>[],
+    this.searchResult,
     this.error,
   });
 
   final HomeStatus status;
   final List<Station> stations;
+  final List<Station>? searchResult;
   final dynamic error;
 
   HomeState copyWithError({
@@ -23,6 +25,27 @@ final class HomeState extends Equatable {
     );
   }
 
+  HomeState copyWithSearchResult({
+    required List<Station> initialStations,  
+    required List<Station> searchResult,
+  }) {
+    return HomeState(
+      status: HomeStatus.success,
+      stations: initialStations,
+      searchResult: searchResult,
+      error: null,
+    );
+  }
+
+  HomeState copyWithInitialStations({required List<Station> initialStations}) {
+    return HomeState(
+      status: HomeStatus.success,
+      stations: initialStations,
+      searchResult: initialStations,
+      error: null,
+    );
+  }
+
   @override
-  List<Object?> get props => [status, stations, error];
+  List<Object?> get props => [status, stations, searchResult, error];
 }

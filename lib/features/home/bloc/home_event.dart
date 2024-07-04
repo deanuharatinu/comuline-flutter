@@ -20,3 +20,20 @@ class HomeStationDetailPressed extends HomeEvent {
 
   final String stationId;
 }
+
+abstract class HomeWithSearchTerm extends HomeEvent {
+  const HomeWithSearchTerm({
+    required this.searchTerm,
+  });
+
+  final String searchTerm;
+}
+
+final class HomeSearchTermChanged extends HomeWithSearchTerm {
+  const HomeSearchTermChanged({
+    required super.searchTerm,
+  });
+
+  @override
+  List<Object?> get props => [searchTerm];
+}

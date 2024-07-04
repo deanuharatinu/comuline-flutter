@@ -36,6 +36,12 @@ class _AddStationViewState extends State<AddStationView> {
   }
 
   @override
+  void dispose() {
+    _searchBarController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = ComulineTheme.of(context);
 

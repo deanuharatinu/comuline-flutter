@@ -28,11 +28,25 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> with AutoRouteAwareStateMixin {
   HomeBloc get _bloc => context.read<HomeBloc>();
+  final TextEditingController _searchBarController = TextEditingController();
 
   @override
   void initState() {
     _bloc.add(const HomeStarted());
+
+    _searchBarController.addListener(() {
+      _bloc.add(
+        HomeSearchTermChanged(searchTerm: _searchBarController.text),
+      );
+    });
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchBarController.dispose();
+    super.dispose();
   }
 
   @override
@@ -45,6 +59,7 @@ class _HomeViewState extends State<HomeView> with AutoRouteAwareStateMixin {
     if (isLoading) return;
 
     _bloc.add(const HomeRefresh());
+    _searchBarController.text = '';
     await for (final _ in _bloc.stream) {
       break;
     }
@@ -78,12 +93,14 @@ class _HomeViewState extends State<HomeView> with AutoRouteAwareStateMixin {
                       pinned: true,
                       floating: true,
                       surfaceTintColor: Colors.grey.shade500,
-                      flexibleSpace: const FlexibleSpaceBar(
-                        titlePadding: EdgeInsets.symmetric(
+                      flexibleSpace: FlexibleSpaceBar(
+                        titlePadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 8,
                         ),
-                        title: CustomSearchBar(),
+                        title: CustomSearchBar(
+                          controller: _searchBarController,
+                        ),
                       ),
                     ),
                     CupertinoSliverRefreshControl(
@@ -136,15 +153,18 @@ class StationList extends StatelessWidget {
         }
       },
       builder: (context, state) {
+        debugPrint(state.toString());
+
         if (state.status == HomeStatus.loading) {
           return const LoadingStationList();
         }
 
-        if (state.stations.isEmpty) {
+        final stations = state.searchResult ?? state.stations;
+        if (stations.isEmpty) {
           return const EmptyStationList();
         } else {
           return ShowStationList(
-            stationList: state.stations,
+            stationList: stations,
           );
         }
       },
