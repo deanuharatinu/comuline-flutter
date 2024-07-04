@@ -2,7 +2,14 @@ import 'package:comuline/component_library/theme/comuline_theme.dart';
 import 'package:flutter/material.dart';
 
 class CustomSearchBar extends StatefulWidget {
-  const CustomSearchBar({super.key});
+  const CustomSearchBar({
+    this.controller,
+    this.onChanged,
+    super.key,
+  });
+
+  final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
 
   @override
   State<StatefulWidget> createState() {
@@ -24,6 +31,8 @@ class _CustomSearchBar extends State<CustomSearchBar> {
     final theme = ComulineTheme.of(context);
 
     return SearchBar(
+      controller: widget.controller,
+      onChanged: widget.onChanged,
       focusNode: _searchBarFocusNode,
       shape: WidgetStatePropertyAll(
         RoundedRectangleBorder(

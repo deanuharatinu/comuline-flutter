@@ -24,3 +24,23 @@ final class AddStationLoadSuccess extends AddStationState {
         notBookmarkedStationList.length,
       ];
 }
+
+final class AddStationSearchSuccess extends AddStationState {
+  const AddStationSearchSuccess({
+    required this.initialBookmarkedStationList,
+    required this.initialNotBookmarkedStationList,
+    required this.searchResultBookmarkedStationList,
+    required this.searchResultNotBookmarkedStationList,
+  });
+
+  final List<Station> initialBookmarkedStationList;
+  final List<Station> initialNotBookmarkedStationList;
+  final List<Station> searchResultBookmarkedStationList;
+  final List<Station> searchResultNotBookmarkedStationList;
+
+  @override
+  List<Object> get props => [
+        searchResultBookmarkedStationList.length,
+        searchResultNotBookmarkedStationList.length,
+      ];
+}

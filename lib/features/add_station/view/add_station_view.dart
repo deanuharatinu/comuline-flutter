@@ -5,6 +5,7 @@ import 'package:comuline/component_library/theme/comuline_theme_data.dart';
 import 'package:comuline/component_library/theme/styled_status_bar.dart';
 import 'package:comuline/features/add_station/bloc/add_station_bloc.dart';
 import 'package:comuline/features/home/widget/custom_search_bar.dart';
+import 'package:comuline/models/station.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,10 +18,20 @@ class AddStationView extends StatefulWidget {
 
 class _AddStationViewState extends State<AddStationView> {
   AddStationBloc get _bloc => context.read<AddStationBloc>();
+  final TextEditingController _searchBarController = TextEditingController();
 
   @override
   void initState() {
     _bloc.add(const AddStationStarted());
+
+    _searchBarController.addListener(() {
+      _bloc.add(
+        AddStationSearchTermChanged(
+          searchTerm: _searchBarController.text,
+        ),
+      );
+    });
+
     super.initState();
   }
 
@@ -44,14 +55,16 @@ class _AddStationViewState extends State<AddStationView> {
                     floating: true,
                     leading: const AutoLeadingButton(),
                     surfaceTintColor: Colors.grey.shade500,
-                    flexibleSpace: const FlexibleSpaceBar(
-                      titlePadding: EdgeInsets.only(
+                    flexibleSpace: FlexibleSpaceBar(
+                      titlePadding: const EdgeInsets.only(
                         top: 8,
                         bottom: 8,
                         right: 16,
                         left: 58,
                       ),
-                      title: CustomSearchBar(),
+                      title: CustomSearchBar(
+                        controller: _searchBarController,
+                      ),
                     ),
                   ),
                   SliverToBoxAdapter(
@@ -69,7 +82,10 @@ class _AddStationViewState extends State<AddStationView> {
                       ),
                     ),
                   ),
-                  _BookmarkedStationList(state: state),
+                  _BookmarkedStationList(
+                    state: state,
+                    searchTerm: _searchBarController.text,
+                  ),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -93,7 +109,10 @@ class _AddStationViewState extends State<AddStationView> {
                       ),
                     ),
                   ),
-                  _NotBookmarkedStationList(state: state),
+                  _NotBookmarkedStationList(
+                    state: state,
+                    searchTerm: _searchBarController.text,
+                  ),
                 ],
               ),
             ),
@@ -107,17 +126,30 @@ class _AddStationViewState extends State<AddStationView> {
 class _BookmarkedStationList extends StatelessWidget {
   const _BookmarkedStationList({
     required this.state,
+    required this.searchTerm,
   });
 
   final AddStationState state;
+  final String searchTerm;
 
   @override
   Widget build(BuildContext context) {
     if (state is AddStationInitial) {
       return const SliverToBoxAdapter();
-    } else if (state is AddStationLoadSuccess) {
-      final bookmarkedStationList =
-          (state as AddStationLoadSuccess).bookmarkedStationList;
+    } else if (state is AddStationLoadSuccess ||
+        state is AddStationSearchSuccess) {
+      List<Station> bookmarkedStationList = [];
+
+      if (state is AddStationLoadSuccess) {
+        bookmarkedStationList =
+            (state as AddStationLoadSuccess).bookmarkedStationList;
+      }
+
+      if (state is AddStationSearchSuccess) {
+        bookmarkedStationList = (state as AddStationSearchSuccess)
+            .searchResultBookmarkedStationList;
+      }
+
       return SliverList(
         delegate: SliverChildBuilderDelegate(
           childCount: bookmarkedStationList.length,
@@ -135,6 +167,7 @@ class _BookmarkedStationList extends StatelessWidget {
                 onPressed: () {
                   final event = AddStationRemoveBookmarkPressed(
                     stationId: station.id,
+                    searchTerm: searchTerm,
                   );
                   context.read<AddStationBloc>().add(event);
                 },
@@ -153,17 +186,30 @@ class _BookmarkedStationList extends StatelessWidget {
 class _NotBookmarkedStationList extends StatelessWidget {
   const _NotBookmarkedStationList({
     required this.state,
+    required this.searchTerm,
   });
 
   final AddStationState state;
+  final String searchTerm;
 
   @override
   Widget build(BuildContext context) {
     if (state is AddStationInitial) {
       return const SliverToBoxAdapter();
-    } else if (state is AddStationLoadSuccess) {
-      final notBookmarkedStationList =
-          (state as AddStationLoadSuccess).notBookmarkedStationList;
+    } else if (state is AddStationLoadSuccess ||
+        state is AddStationSearchSuccess) {
+      List<Station> notBookmarkedStationList = [];
+
+      if (state is AddStationLoadSuccess) {
+        notBookmarkedStationList =
+            (state as AddStationLoadSuccess).notBookmarkedStationList;
+      }
+
+      if (state is AddStationSearchSuccess) {
+        notBookmarkedStationList = (state as AddStationSearchSuccess)
+            .searchResultNotBookmarkedStationList;
+      }
+
       return SliverList(
         delegate: SliverChildBuilderDelegate(
           childCount: notBookmarkedStationList.length,
@@ -174,6 +220,7 @@ class _NotBookmarkedStationList extends StatelessWidget {
               onTap: () {
                 final event = AddStationBookmarkPressed(
                   stationId: station.id,
+                  searchTerm: searchTerm,
                 );
                 context.read<AddStationBloc>().add(event);
               },
